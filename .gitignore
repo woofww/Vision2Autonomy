@@ -1,2 +1,18 @@
-#python build file
-*.pyc
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Virtual environments and editors
+.venv/
+.test-deps/
+.idea/
+.vscode/
+
+# Generated outputs
+outputs/
