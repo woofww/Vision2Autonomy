@@ -73,7 +73,7 @@ Generate every reference image from the repository root:
 
 ```bash
 python -m pip install -e ".[dev]"
-python -m examples.generate_reference_images
+python -m vision2autonomy.examples.reference_images
 ```
 
 The input is generated deterministically with seed `7`. It contains flat

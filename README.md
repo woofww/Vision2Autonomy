@@ -79,7 +79,7 @@ See the complete [case documentation standard](docs/CASE_STANDARD.md). The
 current reference figures can be regenerated with:
 
 ```bash
-python -m examples.generate_reference_images
+python -m vision2autonomy.examples.reference_images
 ```
 
 ## Project history

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from examples.generate_reference_images import (
+from vision2autonomy.examples.reference_images import (
     generate_reference_images,
     labelled_grid,
     synthetic_scene,
@@ -39,4 +39,3 @@ def test_reference_generator_writes_expected_pngs(tmp_path: Path) -> None:
 def test_labelled_grid_rejects_empty_input() -> None:
     with pytest.raises(ValueError, match="must not be empty"):
         labelled_grid({})
-

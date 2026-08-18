@@ -78,7 +78,7 @@ From the repository root:
 
 ```bash
 python -m pip install -e ".[dev]"
-python -m examples.generate_reference_images
+python -m vision2autonomy.examples.reference_images
 ```
 
 The script uses the deterministic synthetic scene documented in Chapter 01 and
