@@ -1,5 +1,7 @@
 # Chapter 02: Edge detection
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 This chapter builds a complete Canny edge detector without calling
 `cv2.Canny`. Canny is useful here not merely as a feature: it connects image
 smoothing, discrete derivatives, geometry, classification, and graph traversal

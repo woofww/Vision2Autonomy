@@ -1,5 +1,7 @@
 # Chapter 01: Image foundations
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 This chapter establishes the numerical operations used throughout the rest of
 the project. We represent a grayscale image as a two-dimensional NumPy array,
 implement true two-dimensional convolution, and use it to build Gaussian

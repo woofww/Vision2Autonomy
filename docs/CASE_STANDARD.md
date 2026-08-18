@@ -1,5 +1,7 @@
 # Case documentation standard
 
+[English](CASE_STANDARD.md) | [简体中文](CASE_STANDARD.zh-CN.md)
+
 Every Vision2Autonomy case is considered complete only when another learner can
 reproduce and understand it without reading undocumented source code.
 
@@ -32,4 +34,3 @@ Each case must provide:
 A chapter is not complete when its code merely runs. It is complete when the
 documented command regenerates the displayed result, the tests pass, and the
 reader can explain the result and its limitations.
-
