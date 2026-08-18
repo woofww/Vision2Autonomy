@@ -68,6 +68,20 @@ assignment/             original 2016 coursework, retained for history
 
 See the [roadmap](docs/roadmap.md) for upcoming chapters.
 
+## Case documentation contract
+
+Every case must include an executable reproduction command, its exact input,
+meaningful intermediate images, a final reference image, parameter guidance,
+result interpretation, known limitations, and an automated test. Generated
+figures are committed under `docs/assets/` and must be reproducible from code.
+
+See the complete [case documentation standard](docs/CASE_STANDARD.md). The
+current reference figures can be regenerated with:
+
+```bash
+python -m examples.generate_reference_images
+```
+
 ## Project history
 
 This repository began as a 2016 computer-vision assignment. Its original code
