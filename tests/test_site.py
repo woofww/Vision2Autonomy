@@ -51,7 +51,19 @@ def test_site_uses_local_javascript_without_inline_handlers() -> None:
     assert "oninput=" not in html
 
 
+def test_convolution_workbench_is_horizontally_scrollable() -> None:
+    html = (SITE_ROOT / "index.html").read_text(encoding="utf-8")
+    styles = (SITE_ROOT / "styles.css").read_text(encoding="utf-8")
+    assert 'class="matrix-scroll"' in html
+    assert 'aria-label="卷积矩阵，可横向滑动"' in html
+    assert 'tabindex="0"' in html
+    assert 'data-scroll-matrix="-1"' in html
+    assert 'data-scroll-matrix="1"' in html
+    assert "overflow-x: auto" in styles
+    assert "touch-action: pan-y" in styles
+
+
 def test_javascript_contains_all_interactions() -> None:
     javascript = (SITE_ROOT / "app.js").read_text(encoding="utf-8")
-    for feature in ("calculateConvolution", "cannyStages", "renderRegion", "themeToggle"):
+    for feature in ("calculateConvolution", "cannyStages", "renderRegion", "themeToggle", "setPointerCapture", "scrollLeft", "scrollMatrix"):
         assert feature in javascript
