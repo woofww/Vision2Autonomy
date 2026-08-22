@@ -48,20 +48,30 @@ calculateConvolution();
 const matrixScroller = document.querySelector(".matrix-scroll");
 let dragStartX = 0;
 let dragStartScroll = 0;
+let pendingDragScroll = 0;
+let dragFrame = 0;
 
 matrixScroller.addEventListener("pointerdown", (event) => {
+  if (event.pointerType !== "mouse" || event.target.closest("input, button")) return;
   dragStartX = event.clientX;
   dragStartScroll = matrixScroller.scrollLeft;
+  pendingDragScroll = dragStartScroll;
   matrixScroller.classList.add("dragging");
   matrixScroller.setPointerCapture(event.pointerId);
 });
 
 matrixScroller.addEventListener("pointermove", (event) => {
   if (!matrixScroller.classList.contains("dragging")) return;
-  matrixScroller.scrollLeft = dragStartScroll - (event.clientX - dragStartX);
+  pendingDragScroll = dragStartScroll - (event.clientX - dragStartX);
+  if (dragFrame) return;
+  dragFrame = requestAnimationFrame(() => {
+    matrixScroller.scrollLeft = pendingDragScroll;
+    dragFrame = 0;
+  });
 });
 
 function stopMatrixDrag(event) {
+  if (!matrixScroller.classList.contains("dragging")) return;
   matrixScroller.classList.remove("dragging");
   if (matrixScroller.hasPointerCapture(event.pointerId)) matrixScroller.releasePointerCapture(event.pointerId);
 }
