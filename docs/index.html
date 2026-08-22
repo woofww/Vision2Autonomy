@@ -88,15 +88,22 @@
               <small id="convolution-equation">5×50 − 4×10</small>
             </div>
           </div>
-          <div class="matrix-workbench">
-            <div>
-              <h4>图像窗口</h4>
-              <div class="matrix" id="pixel-matrix" aria-label="3×3 图像窗口"></div>
+          <div class="matrix-scroll" role="region" aria-label="卷积矩阵，可横向滑动" tabindex="0">
+            <div class="matrix-workbench">
+              <div>
+                <h4>图像窗口</h4>
+                <div class="matrix" id="pixel-matrix" aria-label="3×3 图像窗口"></div>
+              </div>
+              <span class="operator">∗</span>
+              <div>
+                <h4>卷积核</h4>
+                <div class="matrix kernel" id="kernel-matrix" aria-label="3×3 卷积核"></div>
+              </div>
             </div>
-            <span class="operator">∗</span>
-            <div>
-              <h4>卷积核</h4>
-              <div class="matrix kernel" id="kernel-matrix" aria-label="3×3 卷积核"></div>
+            <div class="swipe-hint">
+              <button type="button" data-scroll-matrix="-1" aria-label="向左查看图像窗口">←</button>
+              <span>拖动或左右滑动</span>
+              <button type="button" data-scroll-matrix="1" aria-label="向右查看卷积核">→</button>
             </div>
           </div>
         </article>

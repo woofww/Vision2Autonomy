@@ -45,6 +45,45 @@ buildMatrix(pixelMatrix, pixelDefaults, "pixel");
 buildMatrix(kernelMatrix, kernelPresets.sharpen, "kernel");
 calculateConvolution();
 
+const matrixScroller = document.querySelector(".matrix-scroll");
+let dragStartX = 0;
+let dragStartScroll = 0;
+
+matrixScroller.addEventListener("pointerdown", (event) => {
+  dragStartX = event.clientX;
+  dragStartScroll = matrixScroller.scrollLeft;
+  matrixScroller.classList.add("dragging");
+  matrixScroller.setPointerCapture(event.pointerId);
+});
+
+matrixScroller.addEventListener("pointermove", (event) => {
+  if (!matrixScroller.classList.contains("dragging")) return;
+  matrixScroller.scrollLeft = dragStartScroll - (event.clientX - dragStartX);
+});
+
+function stopMatrixDrag(event) {
+  matrixScroller.classList.remove("dragging");
+  if (matrixScroller.hasPointerCapture(event.pointerId)) matrixScroller.releasePointerCapture(event.pointerId);
+}
+
+matrixScroller.addEventListener("pointerup", stopMatrixDrag);
+matrixScroller.addEventListener("pointercancel", stopMatrixDrag);
+
+function scrollMatrix(direction) {
+  matrixScroller.scrollBy({ left: direction * Math.min(230, matrixScroller.clientWidth * 0.72), behavior: "smooth" });
+}
+
+document.querySelectorAll("[data-scroll-matrix]").forEach((button) => {
+  button.addEventListener("click", () => scrollMatrix(Number(button.dataset.scrollMatrix)));
+});
+
+matrixScroller.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+    scrollMatrix(event.key === "ArrowLeft" ? -1 : 1);
+  }
+});
+
 document.querySelectorAll("[data-kernel]").forEach((button) => {
   button.addEventListener("click", () => {
     document.querySelectorAll("[data-kernel]").forEach((item) => item.classList.remove("active"));
