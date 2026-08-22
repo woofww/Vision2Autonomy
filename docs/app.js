@@ -104,7 +104,7 @@ const themeToggle = document.querySelector("#theme-toggle");
 const storedTheme = localStorage.getItem("v2a-theme");
 if (storedTheme) document.documentElement.dataset.theme = storedTheme;
 themeToggle.addEventListener("click", () => {
-  const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = next;
   localStorage.setItem("v2a-theme", next);
 });
