@@ -15,6 +15,7 @@ MARKDOWN_LINK = re.compile(r"!?\[[^]]*]\(([^)]+)\)")
         ("docs/CASE_STANDARD.md", "docs/CASE_STANDARD.zh-CN.md"),
         ("chapters/01_image_foundations/README.md", "chapters/01_image_foundations/README.zh-CN.md"),
         ("chapters/02_edge_detection/README.md", "chapters/02_edge_detection/README.zh-CN.md"),
+        ("chapters/03_harris_corners/README.md", "chapters/03_harris_corners/README.zh-CN.md"),
     ],
 )
 def test_bilingual_document_pairs_exist(english: str, chinese: str) -> None:
@@ -37,4 +38,3 @@ def test_all_local_markdown_links_resolve() -> None:
                 failures.append(f"{document.relative_to(REPOSITORY_ROOT)} -> {target}")
 
     assert not failures, "Broken local documentation links:\n" + "\n".join(failures)
-

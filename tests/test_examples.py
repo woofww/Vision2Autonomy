@@ -29,11 +29,23 @@ def test_reference_generator_writes_expected_pngs(tmp_path: Path) -> None:
         "chapter01_convolution.png",
         "chapter02_canny_stages.png",
         "chapter02_canny_edges.png",
+        "chapter03_harris_stages.png",
+        "chapter03_harris_corners.png",
+        "chapter03_harris_window.gif",
     }
     for path in paths:
         assert path.exists()
         with Image.open(path) as image:
             image.verify()
+
+
+def test_harris_gif_is_animated(tmp_path: Path) -> None:
+    paths = generate_reference_images(tmp_path)
+    gif_path = next(path for path in paths if path.suffix == ".gif")
+
+    with Image.open(gif_path) as animation:
+        assert animation.is_animated
+        assert animation.n_frames >= 20
 
 
 def test_labelled_grid_rejects_empty_input() -> None:

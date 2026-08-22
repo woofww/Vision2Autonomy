@@ -83,10 +83,11 @@
 |---|---|:---:|---|
 | 01 | 图像数组、二维卷积、Gaussian 平滑、锐化 | ✅ 已完成 | [中文教程](chapters/01_image_foundations/README.zh-CN.md) · [执行图](docs/assets/chapter01_convolution.png) |
 | 02 | Sobel、NMS、双阈值、滞后连接、完整 Canny | ✅ 已完成 | [中文教程](chapters/02_edge_detection/README.zh-CN.md) · [执行图](docs/assets/chapter02_canny_stages.png) |
-| 03 | 角点、局部特征、Hough、形态学、光流 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
-| 04 | 相机标定、Homography、对极几何、深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
-| 05 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
-| 06 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 03 | 结构张量、特征值、Harris 角点与 NMS | ✅ 已完成 | [中文教程](chapters/03_harris_corners/README.zh-CN.md) · [教学 GIF](docs/assets/chapter03_harris_window.gif) |
+| 04 | 特征描述、匹配、Hough、形态学、光流 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 05 | 相机标定、Homography、对极几何、深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 06 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 07 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 
 > 进度表只标记仓库中已经有代码、文档、执行图和测试的内容，不用计划冒充成果。
 
@@ -213,6 +214,7 @@ Vision2Autonomy/
 ├── src/vision2autonomy/          # 可安装的正式库
 │   ├── image/                    # 卷积与图像滤波
 │   ├── edges/                    # Sobel 与 Canny
+│   ├── features/                 # Harris 角点与后续局部特征
 │   └── examples/                 # 可复现图片生成器
 ├── chapters/                     # 中英文学习章节
 ├── docs/assets/                  # 代码生成的参考图片
@@ -230,6 +232,7 @@ GitHub Actions 在 Python 3.10 和 3.12 上运行完整测试。当前测试范�
 - Gaussian 核归一化、对称性和常量保持性质；
 - 已知阶跃边缘的 Canny 定位；
 - NMS、双阈值和八邻域滞后连接；
+- Harris 角点定位、结构张量特征值和最小距离约束；
 - CLI 端到端图片读写；
 - 参考图片的确定性生成和 PNG 完整性；
 - 中英文文档成对存在；

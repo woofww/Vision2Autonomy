@@ -83,10 +83,11 @@ Every topic follows the same loop:
 |---|---|:---:|---|
 | 01 | Image arrays, 2-D convolution, Gaussian smoothing, sharpening | ✅ Complete | [Tutorial](chapters/01_image_foundations/README.md) · [Result](docs/assets/chapter01_convolution.png) |
 | 02 | Sobel, NMS, double threshold, hysteresis, complete Canny | ✅ Complete | [Tutorial](chapters/02_edge_detection/README.md) · [Result](docs/assets/chapter02_canny_stages.png) |
-| 03 | Corners, local features, Hough, morphology, optical flow | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
-| 04 | Calibration, homography, epipolar geometry, depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
-| 05 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
-| 06 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 03 | Structure tensor, eigenvalues, Harris corners, and NMS | ✅ Complete | [Tutorial](chapters/03_harris_corners/README.md) · [Teaching GIF](docs/assets/chapter03_harris_window.gif) |
+| 04 | Feature description, matching, Hough, morphology, optical flow | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 05 | Calibration, homography, epipolar geometry, depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 06 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 07 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 
 > A phase is marked complete only when code, documentation, reference images, and tests are present. Plans are not presented as achievements.
 
@@ -187,6 +188,7 @@ Vision2Autonomy/
 ├── src/vision2autonomy/          # installable library
 │   ├── image/                    # convolution and filtering
 │   ├── edges/                    # Sobel and Canny
+│   ├── features/                 # Harris corners and future local features
 │   └── examples/                 # reproducible figure generators
 ├── chapters/                     # bilingual learning chapters
 ├── docs/assets/                  # code-generated reference figures
