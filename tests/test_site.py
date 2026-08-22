@@ -60,10 +60,12 @@ def test_convolution_workbench_is_horizontally_scrollable() -> None:
     assert 'data-scroll-matrix="-1"' in html
     assert 'data-scroll-matrix="1"' in html
     assert "overflow-x: auto" in styles
-    assert "touch-action: pan-y" in styles
+    assert "touch-action: pan-x pan-y" in styles
+    assert "-webkit-overflow-scrolling: touch" in styles
+    assert "scroll-snap-type: x proximity" in styles
 
 
 def test_javascript_contains_all_interactions() -> None:
     javascript = (SITE_ROOT / "app.js").read_text(encoding="utf-8")
-    for feature in ("calculateConvolution", "cannyStages", "renderRegion", "themeToggle", "setPointerCapture", "scrollLeft", "scrollMatrix"):
+    for feature in ("calculateConvolution", "cannyStages", "renderRegion", "themeToggle", "setPointerCapture", "scrollLeft", "scrollMatrix", "requestAnimationFrame", 'pointerType !== "mouse"'):
         assert feature in javascript

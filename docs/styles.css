@@ -116,7 +116,7 @@ h1 span { color: var(--accent); }
 .classification p { margin-bottom: 0; color: var(--muted); }
 .text-link { display: inline-block; margin-top: 10px; color: var(--accent-2); font-weight: 700; }
 
-.matrix-scroll { min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-color: var(--line) transparent; scrollbar-width: thin; touch-action: pan-y; cursor: grab; }
+.matrix-scroll { min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-color: var(--line) transparent; scrollbar-width: thin; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; cursor: grab; }
 .matrix-scroll.dragging { cursor: grabbing; user-select: none; scroll-behavior: auto; }
 .matrix-scroll:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 25%, transparent); outline-offset: 4px; }
 .matrix-workbench { display: flex; align-items: center; justify-content: center; gap: 20px; min-width: 516px; width: max-content; margin-inline: auto; padding: 4px; }
@@ -170,6 +170,8 @@ footer a { color: var(--accent-2); }
   .lab-card { padding: 26px 18px; }
   .matrix-scroll { margin-inline: -18px; padding: 2px 18px 10px; scroll-padding-inline: 18px; }
   .matrix-workbench { justify-content: flex-start; gap: 16px; min-width: 516px; margin-inline: 0; }
+  .matrix-workbench > div { scroll-snap-align: start; scroll-snap-stop: normal; }
+  .matrix-scroll { scroll-snap-type: x proximity; }
   .swipe-hint { display: flex; position: sticky; left: 0; width: calc(100vw - 76px); }
   footer { flex-direction: column; text-align: center; }
 }
