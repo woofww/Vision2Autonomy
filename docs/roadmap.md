@@ -15,7 +15,8 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 
 ## Phase 2 — Classical vision
 
-- Corners and local features
+- Harris corners (complete)
+- Additional corners and local features
 - Hough transforms and morphology
 - Optical flow and tracking
 
