@@ -13,6 +13,7 @@ Theory · NumPy from scratch · Reproducible experiments · Automated tests · B
 [![License](https://img.shields.io/badge/License-MIT-2ea44f)](LICENSE)
 [![NumPy](https://img.shields.io/badge/from%20scratch-NumPy-013243?logo=numpy)](src/vision2autonomy)
 [![Docs](https://img.shields.io/badge/docs-English%20%2B%20中文-0ea5e9)](chapters)
+[![Interactive](https://img.shields.io/badge/GitHub%20Pages-interactive%20labs-7c9cff)](https://woofww.github.io/Vision2Autonomy/)
 
 </div>
 
@@ -92,6 +93,8 @@ Every topic follows the same loop:
 > A phase is marked complete only when code, documentation, reference images, and tests are present. Plans are not presented as achievements.
 
 ## 🚀 Quick start
+
+Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny stages, and the Harris structure tensor.
 
 ```bash
 git clone https://github.com/woofww/Vision2Autonomy.git

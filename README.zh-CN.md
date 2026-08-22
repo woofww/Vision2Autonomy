@@ -13,6 +13,7 @@
 [![License](https://img.shields.io/badge/License-MIT-2ea44f)](LICENSE)
 [![NumPy](https://img.shields.io/badge/from%20scratch-NumPy-013243?logo=numpy)](src/vision2autonomy)
 [![Docs](https://img.shields.io/badge/docs-中英双语-0ea5e9)](chapters)
+[![Interactive](https://img.shields.io/badge/GitHub%20Pages-交互实验-7c9cff)](https://woofww.github.io/Vision2Autonomy/)
 
 </div>
 
@@ -92,6 +93,8 @@
 > 进度表只标记仓库中已经有代码、文档、执行图和测试的内容，不用计划冒充成果。
 
 ## 🚀 快速开始
+
+不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny 各阶段和 Harris 结构张量。
 
 ### 1. 获取代码
 
