@@ -86,7 +86,7 @@
 | 02 | Sobel、NMS、双阈值、滞后连接、完整 Canny | ✅ 已完成 | [中文教程](chapters/02_edge_detection/README.zh-CN.md) · [执行图](docs/assets/chapter02_canny_stages.png) |
 | 03 | 结构张量、特征值、Harris 角点与 NMS | ✅ 已完成 | [中文教程](chapters/03_harris_corners/README.zh-CN.md) · [教学 GIF](docs/assets/chapter03_harris_window.gif) |
 | 04 | 补丁描述子、匹配、归一化 DLT 与 RANSAC | ✅ 已完成 | [中文教程](chapters/04_feature_matching/README.zh-CN.md) · [匹配结果](docs/assets/chapter04_ransac_inliers.png) |
-| 05 | 相机标定、Homography、对极几何、深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 05 | 针孔投影、基础矩阵、对极几何与三角化 | ✅ 已完成 | [中文教程](chapters/05_multiview_geometry/README.zh-CN.md) · [深度结果](docs/assets/chapter05_triangulated_depth.png) |
 | 06 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 | 07 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 
@@ -94,7 +94,13 @@
 
 ## 🚀 快速开始
 
-不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny 各阶段、Harris 结构张量和 RANSAC 几何验证。
+### 为什么这些基础算法与自动驾驶有关？
+
+![从基础视觉算法到自动驾驶场景](docs/assets/autonomous_driving_cv_map.png)
+
+卷积负责稳定像素，边缘提供车道和轮廓候选，角点形成可重复地标，跨帧匹配支持运动估计，双目视差与三角化恢复空间距离。每章都包含独立的“自动驾驶中的作用”与失效案例，帮助你带着目标学习，而不是孤立地背公式。
+
+不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny、Harris、RANSAC 和双目深度。
 
 ### 1. 获取代码
 

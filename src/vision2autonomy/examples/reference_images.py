@@ -24,6 +24,12 @@ from vision2autonomy.features.matching import (
 )
 from vision2autonomy.image.convolution import convolve2d
 from vision2autonomy.image.filters import gaussian_blur
+from vision2autonomy.geometry import (
+    camera_matrix,
+    estimate_fundamental,
+    project_points_3d,
+    triangulate_points,
+)
 
 DEFAULT_OUTPUT = Path("docs/assets")
 
@@ -187,6 +193,56 @@ def draw_matches(
     return canvas
 
 
+def multiview_reference_images() -> tuple[Image.Image, Image.Image]:
+    """Render a deterministic rectified stereo pair and its triangulated X-Z view."""
+
+    intrinsics = np.array([[260.0, 0.0, 160.0], [0.0, 260.0, 120.0], [0.0, 0.0, 1.0]])
+    projection_a = camera_matrix(intrinsics, np.eye(3), np.zeros(3))
+    projection_b = camera_matrix(intrinsics, np.eye(3), np.array([-0.7, 0.0, 0.0]))
+    world = np.array([
+        [-1.4, -0.8, 4.0], [-0.5, -0.6, 5.0], [0.5, -0.5, 6.0], [1.3, -0.4, 7.0],
+        [-1.1, 0.1, 6.5], [-0.2, 0.2, 7.5], [0.7, 0.3, 8.5], [1.4, 0.4, 9.5],
+        [-1.3, 0.8, 9.0], [-0.4, 0.9, 10.0], [0.5, 1.0, 11.0], [1.2, 1.1, 12.0],
+    ])
+    pixels_a = project_points_3d(world, projection_a)
+    pixels_b = project_points_3d(world, projection_b)
+    fundamental = estimate_fundamental(pixels_a, pixels_b)
+    reconstructed = triangulate_points(projection_a, projection_b, pixels_a, pixels_b)
+
+    stereo = Image.new("RGB", (640, 270), (247, 249, 248))
+    draw = ImageDraw.Draw(stereo)
+    font = ImageFont.load_default()
+    draw.text((8, 8), "Left camera", fill=(24, 33, 31), font=font)
+    draw.text((328, 8), "Right camera", fill=(24, 33, 31), font=font)
+    colors = [(49, 95, 87), (188, 105, 55), (74, 116, 173), (151, 82, 125)]
+    for index, (left, right) in enumerate(zip(pixels_a, pixels_b)):
+        color = colors[index % len(colors)]
+        y = int(round(left[1])) + 25
+        draw.line((0, y, 640, y), fill=(216, 225, 221), width=1)
+        for offset, point in ((0, left), (320, right)):
+            x = int(round(point[0])) + offset
+            py = int(round(point[1])) + 25
+            draw.ellipse((x - 4, py - 4, x + 4, py + 4), fill=color, outline="white", width=1)
+            draw.text((x + 6, py - 6), str(index + 1), fill=color, font=font)
+
+    depth = Image.new("RGB", (560, 340), (247, 249, 248))
+    depth_draw = ImageDraw.Draw(depth)
+    depth_draw.text((12, 10), "Triangulated points: top view (X-Z)", fill=(24, 33, 31), font=font)
+    origin_x, bottom_y = 280, 305
+    depth_draw.line((40, bottom_y, 525, bottom_y), fill=(99, 112, 108), width=2)
+    depth_draw.line((origin_x, 45, origin_x, bottom_y), fill=(99, 112, 108), width=2)
+    depth_draw.text((520, 312), "X", fill=(99, 112, 108), font=font)
+    depth_draw.text((286, 42), "Z", fill=(99, 112, 108), font=font)
+    for index, (x_value, _, z_value) in enumerate(reconstructed):
+        x = int(round(origin_x + x_value * 120))
+        y = int(round(bottom_y - (z_value - 3.0) * 28))
+        color = colors[index % len(colors)]
+        radius = max(3, int(round(9 - z_value * 0.35)))
+        depth_draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=color)
+        depth_draw.text((x + 6, y - 6), f"{z_value:.0f}m", fill=color, font=font)
+    return stereo, depth
+
+
 def save_harris_window_animation(
     image: np.ndarray,
     result: HarrisResult,
@@ -303,6 +359,7 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     robust = ransac_homography(
         source_xy, destination_xy, threshold=2.0, max_iterations=500, seed=11
     )
+    stereo_geometry, triangulated_depth = multiview_reference_images()
 
     images: dict[str, Image.Image] = {
         "chapter01_input.png": Image.fromarray(source),
@@ -351,6 +408,8 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
             feature_matches,
             robust.inliers,
         ),
+        "chapter05_epipolar_geometry.png": stereo_geometry,
+        "chapter05_triangulated_depth.png": triangulated_depth,
     }
 
     paths = []

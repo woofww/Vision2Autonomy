@@ -213,4 +213,11 @@ pytest tests/test_harris.py tests/test_examples.py tests/test_documentation.py
 - 中英文文档和图片链接有效。
 
 核心实现位于 `src/vision2autonomy/features/harris.py`。
+## 自动驾驶中的作用：寻找可重复定位的稳定地标
+
+![计算机视觉算法在自动驾驶场景中的对应关系](../../docs/assets/autonomous_driving_cv_map.png)
+
+图中的橙色点集中在交通标志、建筑窗角、灯杆和车辆轮廓转折处。这些位置向两个方向移动都会产生明显变化，因此比单纯边缘更适合跨帧重新定位。视觉里程计会跟踪稳定角点来估计车辆运动；纹理缺失的天空和均匀路面几乎提供不了角点。
+
+**场景例子：** 建筑角点通常是静态地标；前车上的角点属于动态物体，若误用于自车运动估计会拉偏结果，因此还需要 RANSAC 和运动分割。
 

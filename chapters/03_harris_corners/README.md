@@ -181,4 +181,11 @@ pytest tests/test_harris.py tests/test_examples.py tests/test_documentation.py
 Tests cover zero response on constant images, localization of four known square corners, edge/corner eigenvalue behavior, ordered distance-constrained selection, invalid input, animated GIF frames, reproducible assets, and bilingual links.
 
 The implementation lives in `src/vision2autonomy/features/harris.py`.
+## Autonomous-driving role: repeatable landmarks for localization
+
+![Computer-vision algorithms mapped to a driving scene](../../docs/assets/autonomous_driving_cv_map.png)
+
+Amber points mark sign, window, pole, and vehicle corners. Their appearance changes in two directions, making them easier to relocate across frames than plain edges. Visual odometry tracks stable corners to estimate ego motion, while sky and uniform asphalt provide almost none.
+
+**Example:** building corners are usually static landmarks; corners on the lead vehicle move independently and can bias ego-motion unless RANSAC or motion segmentation rejects them.
 

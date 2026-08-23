@@ -143,4 +143,11 @@ pytest tests/test_convolution.py tests/test_filters.py tests/test_examples.py
 - 验证固定随机种子产生完全一致的输入图。
 
 可复用代码位于 `src/vision2autonomy/image/`。
+## 自动驾驶中的作用：先把相机像素变成可靠信号
+
+![计算机视觉算法在自动驾驶场景中的对应关系](../../docs/assets/autonomous_driving_cv_map.png)
+
+行车相机首先输出的只是带噪声、曝光变化和运动模糊的像素数组。本章的卷积与 Gaussian 平滑是后续车道边缘、交通标志角点和目标纹理的共同基础；锐化可以突出局部结构，但过强会把传感器噪声一起放大。图中的道路、车辆和行人最终都必须先经过这一层数值处理。
+
+**场景例子：** 黄昏时相机噪声增多，适度平滑能稳定后续梯度；雨天反光强烈时，错误的数据类型或溢出会直接制造虚假边缘。
 

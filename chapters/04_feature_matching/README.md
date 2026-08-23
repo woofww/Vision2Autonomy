@@ -89,6 +89,10 @@ model = ransac_homography(src_xy, dst_xy, threshold=2.0, seed=11)
 
 ## Autonomous-driving connection
 
+![Computer-vision algorithms mapped to a driving scene](../../docs/assets/autonomous_driving_cv_map.png)
+
+The white motion vectors indicate local structures moving between adjacent frames. Matches on buildings and signs mainly encode ego motion; matches on vehicles and pedestrians include independent object motion. RANSAC seeks the dominant static-background consensus within this mixture.
+
 Cross-frame matches support visual odometry, localization, map association, multi-camera calibration, and triangulation. Repeated lane markings, low-texture roads, dynamic vehicles, blur, and exposure changes are common failure cases. A homography only models a plane or near-pure camera rotation; the next geometry chapter introduces camera models, epipolar constraints, and 3D triangulation.
 
 ## Check your understanding

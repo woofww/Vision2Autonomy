@@ -17,6 +17,7 @@ MARKDOWN_LINK = re.compile(r"!?\[[^]]*]\(([^)]+)\)")
         ("chapters/02_edge_detection/README.md", "chapters/02_edge_detection/README.zh-CN.md"),
         ("chapters/03_harris_corners/README.md", "chapters/03_harris_corners/README.zh-CN.md"),
         ("chapters/04_feature_matching/README.md", "chapters/04_feature_matching/README.zh-CN.md"),
+        ("chapters/05_multiview_geometry/README.md", "chapters/05_multiview_geometry/README.zh-CN.md"),
     ],
 )
 def test_bilingual_document_pairs_exist(english: str, chinese: str) -> None:

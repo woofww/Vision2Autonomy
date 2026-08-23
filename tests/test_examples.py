@@ -34,6 +34,8 @@ def test_reference_generator_writes_expected_pngs(tmp_path: Path) -> None:
         "chapter03_harris_window.gif",
         "chapter04_feature_matches.png",
         "chapter04_ransac_inliers.png",
+        "chapter05_epipolar_geometry.png",
+        "chapter05_triangulated_depth.png",
     }
     for path in paths:
         assert path.exists()
