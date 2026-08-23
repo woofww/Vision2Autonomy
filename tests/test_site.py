@@ -1,5 +1,6 @@
 from html.parser import HTMLParser
 from pathlib import Path
+import xml.etree.ElementTree as ElementTree
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +65,13 @@ def test_convolution_workbench_is_horizontally_scrollable() -> None:
     assert "touch-action: pan-x pan-y" in styles
     assert "-webkit-overflow-scrolling: touch" in styles
     assert "scroll-snap-type: x proximity" in styles
+
+
+def test_convolution_teaching_diagrams_are_valid_svg() -> None:
+    for filename in ("chapter01_convolution_intuition.svg", "convolution_three_views.svg"):
+        root = ElementTree.parse(SITE_ROOT / "assets" / filename).getroot()
+        assert root.tag.endswith("svg")
+        assert root.find("{http://www.w3.org/2000/svg}title") is not None
 
 
 def test_javascript_contains_all_interactions() -> None:
