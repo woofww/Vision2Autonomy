@@ -170,6 +170,30 @@ function renderRansacThreshold() {
 thresholdSlider.addEventListener("input", renderRansacThreshold);
 renderRansacThreshold();
 
+const focalSlider = document.querySelector("#focal-slider");
+const baselineSlider = document.querySelector("#baseline-slider");
+const disparitySlider = document.querySelector("#disparity-slider");
+
+function renderStereoDepth() {
+  const focal = Number(focalSlider.value);
+  const baseline = Number(baselineSlider.value);
+  const disparity = Number(disparitySlider.value);
+  const depth = focal * baseline / disparity;
+  const nearDepth = focal * baseline / (disparity + 0.5);
+  const farDepth = focal * baseline / Math.max(disparity - 0.5, 0.5);
+  const uncertainty = Math.max(depth - nearDepth, farDepth - depth);
+  document.querySelector("#focal-value").textContent = `${focal} px`;
+  document.querySelector("#baseline-value").textContent = `${baseline.toFixed(2)} m`;
+  document.querySelector("#disparity-value").textContent = `${disparity} px`;
+  document.querySelector("#depth-value").textContent = `${depth.toFixed(2)} m`;
+  document.querySelector("#depth-formula").textContent = `${focal} × ${baseline.toFixed(2)} ÷ ${disparity}`;
+  document.querySelector("#depth-uncertainty").textContent = `±0.5 px 匹配误差约产生 ±${uncertainty.toFixed(2)} m 深度变化`;
+  document.querySelector("#uncertainty-bar").style.width = `${Math.min(100, 8 + uncertainty * 18)}%`;
+}
+
+[focalSlider, baselineSlider, disparitySlider].forEach((slider) => slider.addEventListener("input", renderStereoDepth));
+renderStereoDepth();
+
 const themeToggle = document.querySelector("#theme-toggle");
 const storedTheme = localStorage.getItem("v2a-theme");
 if (storedTheme) document.documentElement.dataset.theme = storedTheme;

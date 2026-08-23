@@ -25,7 +25,9 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 
 - Camera calibration and distortion
 - Homographies and perspective transforms
-- Epipolar geometry, stereo, and depth
+- Pinhole projection and coordinate transforms (complete)
+- Epipolar geometry and the fundamental matrix (complete)
+- Stereo triangulation and depth sensitivity (complete)
 - Visual odometry
 
 ## Phase 4 — Deep vision

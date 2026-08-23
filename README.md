@@ -86,7 +86,7 @@ Every topic follows the same loop:
 | 02 | Sobel, NMS, double threshold, hysteresis, complete Canny | ✅ Complete | [Tutorial](chapters/02_edge_detection/README.md) · [Result](docs/assets/chapter02_canny_stages.png) |
 | 03 | Structure tensor, eigenvalues, Harris corners, and NMS | ✅ Complete | [Tutorial](chapters/03_harris_corners/README.md) · [Teaching GIF](docs/assets/chapter03_harris_window.gif) |
 | 04 | Patch descriptors, matching, normalized DLT, and RANSAC | ✅ Complete | [Tutorial](chapters/04_feature_matching/README.md) · [Match result](docs/assets/chapter04_ransac_inliers.png) |
-| 05 | Calibration, homography, epipolar geometry, depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 05 | Pinhole projection, fundamental matrix, epipolar geometry, triangulation | ✅ Complete | [Tutorial](chapters/05_multiview_geometry/README.md) · [Depth result](docs/assets/chapter05_triangulated_depth.png) |
 | 06 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 | 07 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 
@@ -94,7 +94,7 @@ Every topic follows the same loop:
 
 ## 🚀 Quick start
 
-Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny stages, the Harris structure tensor, and RANSAC geometric verification.
+Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, and stereo depth.
 
 ```bash
 git clone https://github.com/woofww/Vision2Autonomy.git

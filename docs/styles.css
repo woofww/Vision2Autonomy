@@ -161,6 +161,19 @@ h1 span { color: var(--accent); }
 .legend-inlier, .legend-outlier { width: 18px; height: 3px; margin: auto 0; background: #26ae60; }
 .legend-outlier { margin-left: 10px; background: #dc4141; }
 
+.stereo-controls { display: grid; gap: 16px; margin-top: 24px; }
+.stereo-controls label { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; color: var(--muted); }
+.stereo-controls b { color: var(--accent); font-family: ui-monospace, monospace; }
+.stereo-controls input { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+.depth-result { padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line); border-radius: 16px; background: var(--surface-2); text-align: center; }
+.depth-result > span { color: var(--muted); }
+.depth-result > strong { display: block; margin: 4px 0; color: var(--accent); font-size: clamp(42px, 7vw, 70px); letter-spacing: -.05em; }
+.depth-formula { color: var(--muted); font-family: ui-monospace, monospace; }
+.uncertainty-meter { height: 8px; margin: 20px 0 8px; overflow: hidden; border-radius: 99px; background: var(--line); }
+.uncertainty-meter i { display: block; width: 20%; height: 100%; background: var(--warm); transition: width .25s ease; }
+.depth-result p { min-height: 48px; color: var(--muted); }
+.depth-result img { display: block; width: 100%; border-radius: 10px; }
+
 .next-step { margin-block: 100px; padding: clamp(36px, 7vw, 80px); border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-align: center; }
 .next-step p { max-width: 760px; margin-inline: auto; }
 .next-step .button { margin-top: 18px; }
