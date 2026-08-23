@@ -7,6 +7,8 @@ the project. We represent a grayscale image as a two-dimensional NumPy array,
 implement true two-dimensional convolution, and use it to build Gaussian
 smoothing and sharpening examples.
 
+> If it is still unclear why convolution appears in time systems, images, and neural networks, begin with the standalone [Convolution Special](../special_convolution/README.md).
+
 ## Learning objectives
 
 After completing this chapter, you should be able to:

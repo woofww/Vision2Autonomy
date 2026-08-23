@@ -94,6 +94,8 @@ Every topic follows the same loop:
 
 ## 🚀 Quick start
 
+> New special reading: [Convolution Special — From Intuition and Physics to Images](chapters/special_convolution/README.md), explaining why the same operation appears in time systems, image processing, diffusion, frequency analysis, and neural networks.
+
 ### Why do these foundations matter for autonomous driving?
 
 ![From foundational vision algorithms to a driving scene](docs/assets/autonomous_driving_cv_map.png)

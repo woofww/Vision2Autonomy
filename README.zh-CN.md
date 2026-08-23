@@ -94,6 +94,8 @@
 
 ## 🚀 快速开始
 
+> 新增专题阅读：[《卷积特刊：从直觉、物理到图像》](chapters/special_convolution/README.zh-CN.md)——不从公式背诵开始，而是解释卷积为什么会同时出现在时间系统、图像处理、扩散方程和神经网络中。
+
 ### 为什么这些基础算法与自动驾驶有关？
 
 ![从基础视觉算法到自动驾驶场景](docs/assets/autonomous_driving_cv_map.png)
