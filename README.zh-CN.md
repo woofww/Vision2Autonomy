@@ -85,7 +85,7 @@
 | 01 | 图像数组、二维卷积、Gaussian 平滑、锐化 | ✅ 已完成 | [中文教程](chapters/01_image_foundations/README.zh-CN.md) · [执行图](docs/assets/chapter01_convolution.png) |
 | 02 | Sobel、NMS、双阈值、滞后连接、完整 Canny | ✅ 已完成 | [中文教程](chapters/02_edge_detection/README.zh-CN.md) · [执行图](docs/assets/chapter02_canny_stages.png) |
 | 03 | 结构张量、特征值、Harris 角点与 NMS | ✅ 已完成 | [中文教程](chapters/03_harris_corners/README.zh-CN.md) · [教学 GIF](docs/assets/chapter03_harris_window.gif) |
-| 04 | 特征描述、匹配、Hough、形态学、光流 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 04 | 补丁描述子、匹配、归一化 DLT 与 RANSAC | ✅ 已完成 | [中文教程](chapters/04_feature_matching/README.zh-CN.md) · [匹配结果](docs/assets/chapter04_ransac_inliers.png) |
 | 05 | 相机标定、Homography、对极几何、深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 | 06 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 | 07 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
@@ -94,7 +94,7 @@
 
 ## 🚀 快速开始
 
-不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny 各阶段和 Harris 结构张量。
+不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny 各阶段、Harris 结构张量和 RANSAC 几何验证。
 
 ### 1. 获取代码
 
@@ -217,7 +217,7 @@ Vision2Autonomy/
 ├── src/vision2autonomy/          # 可安装的正式库
 │   ├── image/                    # 卷积与图像滤波
 │   ├── edges/                    # Sobel 与 Canny
-│   ├── features/                 # Harris 角点与后续局部特征
+│   ├── features/                 # Harris、局部描述、匹配与 RANSAC
 │   └── examples/                 # 可复现图片生成器
 ├── chapters/                     # 中英文学习章节
 ├── docs/assets/                  # 代码生成的参考图片

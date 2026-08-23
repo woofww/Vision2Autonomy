@@ -85,7 +85,7 @@ Every topic follows the same loop:
 | 01 | Image arrays, 2-D convolution, Gaussian smoothing, sharpening | ✅ Complete | [Tutorial](chapters/01_image_foundations/README.md) · [Result](docs/assets/chapter01_convolution.png) |
 | 02 | Sobel, NMS, double threshold, hysteresis, complete Canny | ✅ Complete | [Tutorial](chapters/02_edge_detection/README.md) · [Result](docs/assets/chapter02_canny_stages.png) |
 | 03 | Structure tensor, eigenvalues, Harris corners, and NMS | ✅ Complete | [Tutorial](chapters/03_harris_corners/README.md) · [Teaching GIF](docs/assets/chapter03_harris_window.gif) |
-| 04 | Feature description, matching, Hough, morphology, optical flow | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 04 | Patch descriptors, matching, normalized DLT, and RANSAC | ✅ Complete | [Tutorial](chapters/04_feature_matching/README.md) · [Match result](docs/assets/chapter04_ransac_inliers.png) |
 | 05 | Calibration, homography, epipolar geometry, depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 | 06 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 | 07 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
@@ -94,7 +94,7 @@ Every topic follows the same loop:
 
 ## 🚀 Quick start
 
-Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny stages, and the Harris structure tensor.
+Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny stages, the Harris structure tensor, and RANSAC geometric verification.
 
 ```bash
 git clone https://github.com/woofww/Vision2Autonomy.git
@@ -191,7 +191,7 @@ Vision2Autonomy/
 ├── src/vision2autonomy/          # installable library
 │   ├── image/                    # convolution and filtering
 │   ├── edges/                    # Sobel and Canny
-│   ├── features/                 # Harris corners and future local features
+│   ├── features/                 # Harris, local description, matching, and RANSAC
 │   └── examples/                 # reproducible figure generators
 ├── chapters/                     # bilingual learning chapters
 ├── docs/assets/                  # code-generated reference figures

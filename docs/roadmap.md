@@ -16,7 +16,8 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 ## Phase 2 — Classical vision
 
 - Harris corners (complete)
-- Additional corners and local features
+- Local patch description, nearest-neighbor matching, and ratio tests (complete)
+- Normalized DLT and RANSAC homography (complete)
 - Hough transforms and morphology
 - Optical flow and tracking
 

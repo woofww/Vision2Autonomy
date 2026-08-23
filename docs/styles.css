@@ -145,6 +145,22 @@ h1 span { color: var(--accent); }
 .eigen-row b { text-align: right; }
 #eigen-summary { margin: 18px 0 0; color: var(--accent-2); text-align: center; font-weight: 750; }
 
+.threshold-control { display: grid; gap: 12px; margin: 26px 0 20px; color: var(--muted); }
+.threshold-control > span { display: flex; justify-content: space-between; gap: 20px; }
+.threshold-control b { color: var(--accent); font-family: ui-monospace, monospace; }
+.threshold-control input { width: 100%; accent-color: var(--accent); cursor: ew-resize; }
+.consensus-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.consensus-stats > div { padding: 14px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); text-align: center; }
+.consensus-stats strong, .consensus-stats span { display: block; }
+.consensus-stats strong { color: var(--accent); font-size: 24px; }
+.consensus-stats span { color: var(--muted); font-size: 12px; }
+.parameter-guidance { min-height: 52px; }
+.matching-figure { margin: 0; }
+.matching-figure img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 12px; }
+.matching-figure figcaption { display: flex; justify-content: center; gap: 8px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+.legend-inlier, .legend-outlier { width: 18px; height: 3px; margin: auto 0; background: #26ae60; }
+.legend-outlier { margin-left: 10px; background: #dc4141; }
+
 .next-step { margin-block: 100px; padding: clamp(36px, 7vw, 80px); border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-align: center; }
 .next-step p { max-width: 760px; margin-inline: auto; }
 .next-step .button { margin-top: 18px; }

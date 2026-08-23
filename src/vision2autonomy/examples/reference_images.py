@@ -1,4 +1,4 @@
-"""Generate deterministic reference images used by Chapters 01 through 03.
+"""Generate deterministic reference images used by Chapters 01 through 04.
 
 Run after installing the project:
 
@@ -16,6 +16,12 @@ from PIL import Image, ImageDraw, ImageFont
 
 from vision2autonomy.edges.canny import CannyResult, canny
 from vision2autonomy.features.harris import HarrisResult, detect_harris_corners
+from vision2autonomy.features.matching import (
+    MatchResult,
+    describe_patches,
+    match_descriptors,
+    ransac_homography,
+)
 from vision2autonomy.image.convolution import convolve2d
 from vision2autonomy.image.filters import gaussian_blur
 
@@ -139,6 +145,48 @@ def draw_corner_overlay(image: np.ndarray, corners: np.ndarray) -> np.ndarray:
     return np.asarray(overlay)
 
 
+def translated_image(image: np.ndarray, row_shift: int, column_shift: int) -> np.ndarray:
+    """Translate an image without wraparound, filling uncovered pixels with zero."""
+
+    output = np.zeros_like(image)
+    source_rows = slice(max(0, -row_shift), min(image.shape[0], image.shape[0] - row_shift))
+    source_columns = slice(max(0, -column_shift), min(image.shape[1], image.shape[1] - column_shift))
+    target_rows = slice(max(0, row_shift), min(image.shape[0], image.shape[0] + row_shift))
+    target_columns = slice(max(0, column_shift), min(image.shape[1], image.shape[1] + column_shift))
+    output[target_rows, target_columns] = image[source_rows, source_columns]
+    return output
+
+
+def draw_matches(
+    first: np.ndarray,
+    second: np.ndarray,
+    points_a: np.ndarray,
+    points_b: np.ndarray,
+    matches: MatchResult,
+    inliers: np.ndarray | None = None,
+) -> Image.Image:
+    """Draw side-by-side correspondences, optionally marking RANSAC outliers red."""
+
+    height, width = first.shape
+    canvas = Image.new("RGB", (2 * width, height + 30), "white")
+    canvas.paste(Image.fromarray(first).convert("RGB"), (0, 30))
+    canvas.paste(Image.fromarray(second).convert("RGB"), (width, 30))
+    draw = ImageDraw.Draw(canvas)
+    draw.text((8, 9), "Image A", fill="black", font=ImageFont.load_default())
+    draw.text((width + 8, 9), "Image B", fill="black", font=ImageFont.load_default())
+    mask = np.ones(len(matches.pairs), dtype=bool) if inliers is None else np.asarray(inliers, dtype=bool)
+    for index, (index_a, index_b) in enumerate(matches.pairs):
+        row_a, column_a = points_a[index_a]
+        row_b, column_b = points_b[index_b]
+        color = (38, 174, 96) if mask[index] else (220, 65, 65)
+        start = (int(round(column_a)), int(round(row_a)) + 30)
+        end = (int(round(column_b)) + width, int(round(row_b)) + 30)
+        draw.line((start, end), fill=color, width=2)
+        draw.ellipse((start[0] - 3, start[1] - 3, start[0] + 3, start[1] + 3), outline=color, width=2)
+        draw.ellipse((end[0] - 3, end[1] - 3, end[0] + 3, end[1] + 3), outline=color, width=2)
+    return canvas
+
+
 def save_harris_window_animation(
     image: np.ndarray,
     result: HarrisResult,
@@ -224,6 +272,37 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         min_distance=12,
         max_corners=16,
     )
+    shifted = translated_image(corner_source, 12, 18)
+    shifted_harris = detect_harris_corners(
+        shifted, threshold_rel=0.03, min_distance=12, max_corners=20
+    )
+    descriptor_a = describe_patches(corner_source, harris.corners, patch_size=11)
+    descriptor_b = describe_patches(shifted, shifted_harris.corners, patch_size=11)
+    feature_matches = match_descriptors(
+        descriptor_a.descriptors,
+        descriptor_b.descriptors,
+        ratio_threshold=1.0,
+        mutual=False,
+    )
+    # Add two deterministic ambiguous candidates so the teaching image makes
+    # RANSAC's rejection step visible instead of relying on random failures.
+    distractors = np.array(
+        [
+            [0, (int(feature_matches.pairs[0, 1]) + 2) % len(descriptor_b.keypoints)],
+            [1, (int(feature_matches.pairs[1, 1]) + 3) % len(descriptor_b.keypoints)],
+        ],
+        dtype=np.int64,
+    )
+    feature_matches = MatchResult(
+        np.vstack((feature_matches.pairs, distractors)),
+        np.append(feature_matches.distances, [1.0, 1.0]),
+        np.append(feature_matches.ratios, [0.99, 0.99]),
+    )
+    source_xy = descriptor_a.keypoints[feature_matches.pairs[:, 0]][:, ::-1]
+    destination_xy = descriptor_b.keypoints[feature_matches.pairs[:, 1]][:, ::-1]
+    robust = ransac_homography(
+        source_xy, destination_xy, threshold=2.0, max_iterations=500, seed=11
+    )
 
     images: dict[str, Image.Image] = {
         "chapter01_input.png": Image.fromarray(source),
@@ -256,6 +335,21 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         ),
         "chapter03_harris_corners.png": Image.fromarray(
             draw_corner_overlay(corner_source, harris.corners)
+        ),
+        "chapter04_feature_matches.png": draw_matches(
+            corner_source,
+            shifted,
+            descriptor_a.keypoints,
+            descriptor_b.keypoints,
+            feature_matches,
+        ),
+        "chapter04_ransac_inliers.png": draw_matches(
+            corner_source,
+            shifted,
+            descriptor_a.keypoints,
+            descriptor_b.keypoints,
+            feature_matches,
+            robust.inliers,
         ),
     }
 

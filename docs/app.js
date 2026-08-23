@@ -149,6 +149,27 @@ document.querySelectorAll("[data-region]").forEach((button) => {
 });
 renderRegion("flat");
 
+const reprojectionErrors = [0.18, 0.24, 0.31, 0.38, 0.44, 0.51, 0.62, 0.74, 0.88, 1.02, 1.19, 1.42, 1.76, 5.9, 7.4];
+const thresholdSlider = document.querySelector("#ransac-threshold");
+
+function renderRansacThreshold() {
+  const threshold = Number(thresholdSlider.value);
+  const inliers = reprojectionErrors.filter((error) => error <= threshold).length;
+  const outliers = reprojectionErrors.length - inliers;
+  document.querySelector("#ransac-threshold-value").textContent = `${threshold.toFixed(1)} px`;
+  document.querySelector("#ransac-inlier-count").textContent = String(inliers);
+  document.querySelector("#ransac-outlier-count").textContent = String(outliers);
+  document.querySelector("#ransac-inlier-ratio").textContent = `${Math.round(100 * inliers / reprojectionErrors.length)}%`;
+  document.querySelector("#ransac-guidance").textContent = threshold < 1.5
+    ? "阈值偏严：可靠对应也可能被误删，模型可用点减少。"
+    : threshold <= 3.0
+      ? "阈值适中：保留真实对应，同时拒绝明显错误。"
+      : "阈值偏松：错误对应开始混入内点，几何模型可能被拉偏。";
+}
+
+thresholdSlider.addEventListener("input", renderRansacThreshold);
+renderRansacThreshold();
+
 const themeToggle = document.querySelector("#theme-toggle");
 const storedTheme = localStorage.getItem("v2a-theme");
 if (storedTheme) document.documentElement.dataset.theme = storedTheme;
