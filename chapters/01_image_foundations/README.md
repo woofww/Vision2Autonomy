@@ -33,7 +33,23 @@ important because kernels can contain negative or fractional values; calculating
 directly in `uint8` would overflow or discard information. Conversion back to
 `uint8` happens only when an image is saved for display.
 
-## Two-dimensional convolution
+## Before the formula: what does convolution mean?
+
+Think of convolution as carrying a small **local scoring rule** across an image. At each position, the rule looks at nearby pixels and produces one score. Similar positive weights smooth; a large positive center surrounded by negatives emphasizes contrast; opposite signs on the left and right respond to vertical edges.
+
+![The four intuitive steps of convolution](../../docs/assets/chapter01_convolution_intuition.svg)
+
+Each position uses four steps: cover a local window, multiply corresponding values, add the products, and write the result at the output center. Then slide onward. Convolution is not mysterious image blending; it is **one local rule repeated everywhere**.
+
+For the illustrated sharpening example, the center is 50 and its four neighbors are 10:
+
+```text
+5×50 − 4×10 = 210
+```
+
+The bright center is emphasized. If every pixel were 10, the result would remain `5×10−4×10=10`. The completed output is a response map. Sobel, Harris, and convolutional neural networks all build on this idea with different designed or learned local rules.
+
+## Mathematical two-dimensional convolution
 
 For image `I` and kernel `K`, an output pixel is
 

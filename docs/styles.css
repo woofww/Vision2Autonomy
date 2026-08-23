@@ -126,6 +126,10 @@ h1 span { color: var(--accent); }
 .formula small { color: var(--muted); font-family: ui-monospace, monospace; }
 .classification p { margin-bottom: 0; color: var(--muted); }
 .text-link { display: inline-block; margin-top: 10px; color: var(--accent-2); font-weight: 700; }
+.concept-note { margin: 18px 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.concept-note summary { padding: 12px 14px; color: var(--accent); font-weight: 700; cursor: pointer; }
+.concept-note p { margin: 0; padding: 0 14px 12px; color: var(--muted); font-size: 14px; }
+.concept-note img { display: block; width: 100%; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; }
 
 .matrix-scroll { min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-color: var(--line) transparent; scrollbar-width: thin; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; cursor: grab; }
 .matrix-scroll.dragging { cursor: grabbing; user-select: none; scroll-behavior: auto; }
