@@ -19,7 +19,8 @@
 
 - Harris 角点检测（已完成）
 - FAST 等角点检测
-- 局部特征描述与匹配
+- 局部补丁描述、最近邻匹配与比率检验（已完成）
+- 归一化 DLT 与 RANSAC Homography（已完成）
 - Hough 直线和圆检测
 - 数学形态学与轮廓分析
 - Lucas–Kanade 和稠密光流
