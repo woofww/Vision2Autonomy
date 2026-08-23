@@ -94,6 +94,12 @@ Every topic follows the same loop:
 
 ## 🚀 Quick start
 
+### Why do these foundations matter for autonomous driving?
+
+![From foundational vision algorithms to a driving scene](docs/assets/autonomous_driving_cv_map.png)
+
+Convolution stabilizes pixels, edges propose lanes and contours, corners become repeatable landmarks, cross-frame matching supports motion estimation, and stereo disparity plus triangulation recover distance. Every chapter now includes an autonomous-driving role and a concrete failure case so the mathematics has a visible purpose.
+
 Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, and stereo depth.
 
 ```bash

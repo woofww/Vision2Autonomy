@@ -76,6 +76,10 @@ points_3d = triangulate_points(P1, P2, points_left, points_right)
 
 ## Autonomous-driving connection
 
+![Computer-vision algorithms mapped to a driving scene](../../docs/assets/autonomous_driving_cv_map.png)
+
+The translucent road bands represent depth layers. Pixel locations for the lead car and pedestrian become actionable distances only after calibration, disparity, and camera geometry are combined. Disparity shrinks with range, so distant depth is less certain.
+
 These primitives support stereo depth, visual odometry, landmark creation, localization, multi-camera consistency, and ground-plane bird's-eye projection. Production systems must additionally handle distortion, synchronization, rolling shutter, dynamic objects, occlusion, and calibration drift. A later chapter will recover relative camera pose from the essential matrix and connect triangulation to PnP and visual odometry.
 
 ## Check your understanding

@@ -65,6 +65,27 @@
         </ol>
       </section>
 
+      <section class="driving-map section-shell" aria-labelledby="driving-map-title">
+        <div class="section-heading">
+          <p class="eyebrow">WHY IT MATTERS</p>
+          <h2 id="driving-map-title">每个基础算法，都能在道路上找到位置</h2>
+          <p>先知道它最终解决什么问题，再回头理解公式与实现。</p>
+        </div>
+        <div class="driving-map-layout">
+          <figure class="driving-scene">
+            <img src="assets/autonomous_driving_cv_map.png" alt="边缘、角点、特征匹配和深度在自动驾驶道路场景中的应用">
+            <figcaption>教学示意图：视觉叠加用于解释算法关系，并非完整自动驾驶系统输出。</figcaption>
+          </figure>
+          <ol class="application-list">
+            <li><span>01</span><div><b>卷积与滤波</b><p>稳定相机像素，为所有后续感知提供可靠输入。</p></div></li>
+            <li><span>02</span><div><b>边缘</b><p>提取车道、路缘、车辆和行人的轮廓候选。</p></div></li>
+            <li><span>03</span><div><b>角点</b><p>在标志、建筑和结构转折处寻找稳定地标。</p></div></li>
+            <li><span>04</span><div><b>匹配与 RANSAC</b><p>跨帧关联地标，估计自车运动并拒绝动态干扰。</p></div></li>
+            <li><span>05</span><div><b>双目与三角化</b><p>把像素视差转换为前车、行人与道路的空间距离。</p></div></li>
+          </ol>
+        </div>
+      </section>
+
       <section id="labs" class="labs section-shell">
         <div class="section-heading">
           <p class="eyebrow">INTERACTIVE LABS</p>

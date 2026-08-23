@@ -130,6 +130,10 @@ points_3d = triangulate_points(P1, P2, points_left, points_right)
 
 ## 9. 与自动驾驶的联系
 
+![计算机视觉算法在自动驾驶场景中的对应关系](../../docs/assets/autonomous_driving_cv_map.png)
+
+图中从近到远的半透明路面带表示深度层级。前车和行人的像素位置只有结合标定、视差与相机几何后，才能转换为可用于安全判断的距离；越远的区域视差越小，深度不确定性越大。
+
 - 双目深度和前车距离估计；
 - 视觉里程计中的跨帧三角化；
 - 地图点构建和定位；
@@ -145,4 +149,3 @@ points_3d = triangulate_points(P1, P2, points_left, points_right)
 3. 为什么远处目标的深度更不稳定？
 4. 八点法为什么要强制 `F` 的秩为 2？
 5. 三角化前为什么必须过滤错误匹配？
-

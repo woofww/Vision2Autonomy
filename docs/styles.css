@@ -98,6 +98,17 @@ h1 span { color: var(--accent); }
 .roadmap-card.next { border-color: color-mix(in srgb, var(--warm) 55%, var(--line)); }
 .roadmap-card.next span { color: var(--warm); }
 
+.driving-map { padding-block: 90px; }
+.driving-map-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(310px, .55fr); gap: 28px; align-items: stretch; }
+.driving-scene { margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+.driving-scene img { display: block; width: 100%; height: calc(100% - 42px); min-height: 380px; object-fit: cover; }
+.driving-scene figcaption { min-height: 42px; padding: 10px 14px; color: var(--muted); font-size: 12px; }
+.application-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.application-list li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.application-list li > span { color: var(--accent); font-family: ui-monospace, monospace; font-size: 12px; }
+.application-list b { display: block; margin-bottom: 3px; }
+.application-list p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
 .labs { display: grid; gap: 28px; }
 .labs .section-heading { margin-bottom: 14px; }
 .lab-card { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: center; min-height: 470px; padding: clamp(28px, 5vw, 58px); border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
@@ -186,6 +197,8 @@ footer a { color: var(--accent-2); }
   .hero-actions, .trust-list { justify-content: center; }
   .hero-visual { min-height: 420px; }
   .roadmap-grid { grid-template-columns: repeat(3, 1fr); }
+  .driving-map-layout { grid-template-columns: 1fr; }
+  .application-list { grid-template-columns: repeat(2, 1fr); }
   .lab-card { grid-template-columns: 1fr; }
   .lab-card.reverse .lab-copy { order: initial; }
 }
@@ -196,6 +209,8 @@ footer a { color: var(--accent-2); }
   .hero-visual { min-height: 380px; }
   .floating-card { display: none; }
   .roadmap-grid { grid-template-columns: repeat(2, 1fr); }
+  .driving-scene img { min-height: 210px; }
+  .application-list { grid-template-columns: 1fr; }
   .lab-card { padding: 26px 18px; }
   .matrix-scroll { margin-inline: -18px; padding: 2px 18px 10px; scroll-padding-inline: 18px; }
   .matrix-workbench { justify-content: flex-start; gap: 16px; min-width: 516px; margin-inline: 0; }

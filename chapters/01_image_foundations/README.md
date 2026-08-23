@@ -126,3 +126,10 @@ nested-loop implementation, verifies Gaussian symmetry and normalization,
 checks that constant images remain constant, and regenerates every example PNG.
 
 Reusable code lives in `src/vision2autonomy/image/`.
+## Autonomous-driving role: turning camera pixels into reliable signals
+
+![Computer-vision algorithms mapped to a driving scene](../../docs/assets/autonomous_driving_cv_map.png)
+
+A driving camera begins with noisy pixels affected by exposure and motion blur. Convolution and Gaussian smoothing are shared foundations for lane edges, sign corners, and object texture. Sharpening can reveal structure but can also amplify sensor noise. Every road user in the illustration must first pass through this numerical layer.
+
+**Example:** smoothing can stabilize gradients at dusk, while incorrect numeric ranges or overflow can create false edges in wet-road reflections.

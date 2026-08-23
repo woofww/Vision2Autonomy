@@ -159,3 +159,10 @@ pytest tests/test_canny.py tests/test_cli.py tests/test_examples.py
 Tests cover constant images, a known vertical step edge, NMS behavior,
 8-connected hysteresis, invalid parameters, CLI image output, and deterministic
 regeneration of the reference figures.
+## Autonomous-driving role: lanes, curbs, and object contours
+
+![Computer-vision algorithms mapped to a driving scene](../../docs/assets/autonomous_driving_cv_map.png)
+
+The thin teal contours correspond to strong gradients along lane boundaries, curbs, the lead vehicle, and the pedestrian. Canny supplies sparse structure for classical lane proposals and contour analysis, but an edge is not semantic understanding: shadows, fences, and road cracks also create strong responses.
+
+**Example:** edge cues work well on a structured highway, while tree shadows on an urban road require geometry, semantics, or temporal evidence to reject clutter.
