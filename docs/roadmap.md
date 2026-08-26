@@ -18,8 +18,8 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 - Harris corners (complete)
 - Local patch description, nearest-neighbor matching, and ratio tests (complete)
 - Normalized DLT and RANSAC homography (complete)
-- Hough transforms and morphology
-- Optical flow and tracking
+- Hough transforms and morphology (complete)
+- Lucas-Kanade optical flow and tracking (complete)
 
 ## Phase 3 — Camera geometry
 

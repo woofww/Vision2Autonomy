@@ -35,7 +35,7 @@ def parse_site() -> SiteParser:
 
 def test_interactive_site_has_required_labs() -> None:
     parser = parse_site()
-    assert {"convolution-lab", "canny-lab", "harris-lab", "matching-lab", "stereo-lab"} <= parser.ids
+    assert {"convolution-lab", "canny-lab", "harris-lab", "matching-lab", "stereo-lab", "hough-lab", "flow-lab"} <= parser.ids
     assert "driving-map-title" in parser.ids
 
 
@@ -76,5 +76,5 @@ def test_convolution_teaching_diagrams_are_valid_svg() -> None:
 
 def test_javascript_contains_all_interactions() -> None:
     javascript = (SITE_ROOT / "app.js").read_text(encoding="utf-8")
-    for feature in ("calculateConvolution", "cannyStages", "renderRegion", "renderRansacThreshold", "renderStereoDepth", "themeToggle", "setPointerCapture", "scrollLeft", "scrollMatrix", "requestAnimationFrame", 'pointerType !== "mouse"'):
+    for feature in ("calculateConvolution", "cannyStages", "renderRegion", "renderRansacThreshold", "renderStereoDepth", "themeToggle", "setPointerCapture", "scrollLeft", "scrollMatrix", "requestAnimationFrame", 'pointerType !== "mouse"', "houghVote", "houghPeaks", "renderHough", "computeFlowLite", "renderFlowLab", "drawArrow"):
         assert feature in javascript

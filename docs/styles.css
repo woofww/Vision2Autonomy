@@ -227,3 +227,12 @@ footer a { color: var(--accent-2); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+
+
+.hough-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.hough-panel figure, .flow-panel { margin: 0; display: grid; gap: 8px; justify-items: center; }
+.hough-panel canvas, .flow-panel canvas { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); touch-action: manipulation; cursor: crosshair; }
+.hough-panel figcaption, .canvas-caption { margin: 0; color: var(--muted); font-size: 12px; text-align: center; }
+@media (max-width: 680px) {
+  .hough-panel { grid-template-columns: 1fr; }
+}

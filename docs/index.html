@@ -61,7 +61,9 @@
           <li class="roadmap-card complete"><span>03</span><b>角点检测</b><small>结构张量、Harris</small></li>
           <li class="roadmap-card complete"><span>04</span><b>特征匹配</b><small>描述子、匹配、RANSAC</small></li>
           <li class="roadmap-card complete"><span>05</span><b>多视图几何</b><small>相机、深度、三维重建</small></li>
-          <li class="roadmap-card next"><span>06</span><b>驾驶感知</b><small>检测、跟踪、BEV</small></li>
+          <li class="roadmap-card complete"><span>06</span><b>Hough 与形态学</b><small>直线投票、掩膜清理</small></li>
+          <li class="roadmap-card complete"><span>07</span><b>光流与跟踪</b><small>Lucas-Kanade、运动场</small></li>
+          <li class="roadmap-card next"><span>08</span><b>相机标定与深度视觉</b><small>标定、里程计、神经网络</small></li>
         </ol>
       </section>
 
@@ -82,6 +84,8 @@
             <li><span>03</span><div><b>角点</b><p>在标志、建筑和结构转折处寻找稳定地标。</p></div></li>
             <li><span>04</span><div><b>匹配与 RANSAC</b><p>跨帧关联地标，估计自车运动并拒绝动态干扰。</p></div></li>
             <li><span>05</span><div><b>双目与三角化</b><p>把像素视差转换为前车、行人与道路的空间距离。</p></div></li>
+            <li><span>06</span><div><b>Hough 与形态学</b><p>投票找回车道线，清理分割掩膜中的噪点与空洞。</p></div></li>
+            <li><span>07</span><div><b>光流与跟踪</b><p>跨帧关联运动目标，并在去除自车运动后找出独立移动物体。</p></div></li>
           </ol>
         </div>
       </section>
@@ -224,6 +228,61 @@
             <div class="uncertainty-meter"><i id="uncertainty-bar"></i></div>
             <p id="depth-uncertainty">±0.5 px 匹配误差约产生 ±0.11 m 深度变化</p>
             <img src="assets/chapter05_triangulated_depth.png" alt="三角化恢复的 X-Z 深度分布">
+          </div>
+        </article>
+
+        <article class="lab-card reverse" id="hough-lab">
+          <div class="lab-copy">
+            <p class="lab-number">实验 06</p>
+            <h3>Hough 投票累加器</h3>
+            <p>每个边缘像素都为所有穿过它的直线投票。移动阈值观察峰值如何浮现，点击累加器中的亮点，看它对应图像里的哪条直线。</p>
+            <div class="preset-row" role="group" aria-label="选择示例场景">
+              <button class="chip active" type="button" data-hough-scene="road">道路线</button>
+              <button class="chip" type="button" data-hough-scene="shapes">几何图形</button>
+            </div>
+            <label class="threshold-control" for="hough-threshold">
+              <span>峰值阈值 <b id="hough-threshold-value">35%</b></span>
+              <input id="hough-threshold" type="range" min="10" max="90" step="5" value="35">
+            </label>
+            <div class="consensus-stats" aria-live="polite">
+              <div><strong id="hough-votes">0</strong><span>选中峰值票数</span></div>
+              <div><strong id="hough-rho">—</strong><span>rho (px)</span></div>
+              <div><strong id="hough-theta">—</strong><span>theta (°)</span></div>
+            </div>
+            <a class="text-link" href="https://github.com/woofww/Vision2Autonomy/blob/master/chapters/06_hough_morphology/README.zh-CN.md">阅读完整原理 →</a>
+          </div>
+          <div class="hough-panel">
+            <figure>
+              <canvas id="hough-edge-canvas" width="220" height="150" aria-label="边缘图与选中的 Hough 直线"></canvas>
+              <figcaption>边缘图 · 点击累加器选择直线</figcaption>
+            </figure>
+            <figure>
+              <canvas id="hough-accumulator-canvas" width="220" height="150" aria-label="Hough 参数空间累加器"></canvas>
+              <figcaption>累加器 · 越亮票数越多</figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <article class="lab-card" id="flow-lab">
+          <div class="lab-copy">
+            <p class="lab-number">实验 07</p>
+            <h3>Lucas-Kanade 光流</h3>
+            <p>移动矩形和圆形，观察稠密光流向量从亮度变化中恢复。注意平坦背景没有箭头，而物体边缘附近的箭头最密集——这是孔径问题的直接体现。</p>
+            <div class="stereo-controls">
+              <label>水平位移 <b id="flow-dx-value">2 px</b><input id="flow-dx" type="range" min="-3" max="3" step="1" value="2"></label>
+              <label>垂直位移 <b id="flow-dy-value">1 px</b><input id="flow-dy" type="range" min="-3" max="3" step="1" value="1"></label>
+              <label>窗口大小 <b id="flow-window-value">11 px</b><input id="flow-window" type="range" min="5" max="15" step="2" value="11"></label>
+            </div>
+            <div class="consensus-stats" aria-live="polite">
+              <div><strong id="flow-valid-count">0</strong><span>有效向量</span></div>
+              <div><strong id="flow-rect-speed">—</strong><span>矩形内平均速度</span></div>
+              <div><strong id="flow-rect-count">0</strong><span>矩形内向量</span></div>
+            </div>
+            <a class="text-link" href="https://github.com/woofww/Vision2Autonomy/blob/master/chapters/07_optical_flow/README.zh-CN.md">阅读完整原理 →</a>
+          </div>
+          <div class="flow-panel">
+            <canvas id="flow-canvas" width="260" height="190" aria-label="第二帧与叠加的光流向量"></canvas>
+            <p class="canvas-caption">绿色 = 高可信向量 · 橙色 = 低可信向量</p>
           </div>
         </article>
       </section>

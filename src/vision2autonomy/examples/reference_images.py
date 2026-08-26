@@ -1,4 +1,4 @@
-"""Generate deterministic reference images used by Chapters 01 through 04.
+"""Generate deterministic reference images used by Chapters 01 through 07.
 
 Run after installing the project:
 
@@ -15,6 +15,9 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from vision2autonomy.edges.canny import CannyResult, canny
+from vision2autonomy.edges.hough import HoughLineResult, hough_lines
+from vision2autonomy.image.morphology import closing, dilate, erode, opening
+from vision2autonomy.motion.lucas_kanade import OpticalFlowResult, lucas_kanade_flow
 from vision2autonomy.features.harris import HarrisResult, detect_harris_corners
 from vision2autonomy.features.matching import (
     MatchResult,
@@ -243,6 +246,46 @@ def multiview_reference_images() -> tuple[Image.Image, Image.Image]:
     return stereo, depth
 
 
+def road_scene(size: int = 256, seed: int = 3) -> np.ndarray:
+    """Create a synthetic road image with perspective lane lines and noise."""
+
+    canvas = Image.new("L", (size, size), color=205)
+    draw = ImageDraw.Draw(canvas)
+    horizon = int(size * 0.48)
+    draw.polygon(
+        ((int(size * 0.14), size - 1), (int(size * 0.39), horizon), (int(size * 0.61), horizon), (int(size * 0.86), size - 1)),
+        fill=74,
+    )
+    draw.line((int(size * 0.24), size - 4, int(size * 0.47), horizon), fill=235, width=3)
+    draw.line((int(size * 0.76), size - 4, int(size * 0.53), horizon), fill=235, width=3)
+    image = np.asarray(canvas, dtype=np.float64)
+    noise = np.random.default_rng(seed).normal(0.0, 5.0, image.shape)
+    return np.clip(image + noise, 0, 255).astype(np.uint8)
+
+
+def draw_hough_overlay(image: np.ndarray, result: HoughLineResult) -> np.ndarray:
+    """Draw detected Hough line segments in green over a grayscale image."""
+
+    overlay = Image.fromarray(to_uint8(image)).convert("RGB")
+    draw = ImageDraw.Draw(overlay)
+    for x1, y1, x2, y2 in result.segments:
+        draw.line((x1, y1, x2, y2), fill=(38, 174, 96), width=2)
+    return np.asarray(overlay)
+
+
+def morphology_scene(size: int = 128) -> np.ndarray:
+    """Create a binary mask with isolated specks, a hole, and a one-pixel gap."""
+
+    canvas = np.zeros((size, size), dtype=np.uint8)
+    canvas[30:90, 30:90] = 255
+    canvas[56:64, 56:64] = 0  # hole
+    canvas[16:24, 16:52] = 255  # upper bar
+    canvas[25:34, 16:52] = 255  # lower bar, one-pixel gap at row 24
+    for row, column in [(10, 12), (20, 100), (106, 14), (112, 112), (14, 64), (102, 58)]:
+        canvas[row, column] = 255  # isolated specks
+    return canvas
+
+
 def save_harris_window_animation(
     image: np.ndarray,
     result: HarrisResult,
@@ -297,6 +340,155 @@ def save_harris_window_animation(
         save_all=True,
         append_images=frames[1:],
         duration=140,
+        loop=0,
+        optimize=True,
+        disposal=2,
+    )
+
+
+def optical_flow_frame(
+    size: int,
+    rect_dx: int,
+    rect_dy: int,
+    circle_dx: int,
+    circle_dy: int,
+) -> np.ndarray:
+    """Render one synthetic frame with a textured rectangle and circle."""
+
+    # Smooth 2-D textures keep the brightness-constancy linearization valid;
+    # hard periodic edges bias the estimate, a useful property for readers to
+    # discover by changing the patterns.
+    # Long-wavelength patterns keep the single-scale Lucas-Kanade linearization
+    # valid for the small displacements used here; short-period or hard-edge
+    # textures bias the estimate, a useful property to discover.
+    rows, columns = np.indices((size, size))
+    background = (
+        0.4 * columns
+        + 0.25 * rows
+        + 2.0 * np.sin(2.0 * np.pi * rows / 36.0)
+        + 2.0 * np.sin(2.0 * np.pi * (rows + columns) / 28.0)
+    )
+    # Pattern content is attached to the object and must shift with it; a
+    # pattern fixed to image coordinates would make interior pixels identical
+    # across frames and leave only the occlusion boundary visible.
+    rect_rows = rows - rect_dy
+    rect_cols = columns - rect_dx
+    rect_pattern = (
+        205.0
+        + 10.0 * np.sin(2.0 * np.pi * (rect_rows + rect_cols) / 36.0)
+        + 6.0 * np.sin(2.0 * np.pi * (rect_rows + 2.0 * rect_cols) / 30.0)
+    )
+    circle_rows = rows - circle_dy
+    circle_cols = columns - circle_dx
+    circle_pattern = (
+        32.0
+        + 8.0 * np.sin(2.0 * np.pi * (circle_rows + circle_cols) / 30.0)
+        + 4.0 * np.sin(2.0 * np.pi * (circle_rows - circle_cols) / 24.0)
+    )
+    frame = background.copy()
+    rect_mask = (
+        (columns >= 56 + rect_dx)
+        & (columns < 104 + rect_dx)
+        & (rows >= 70 + rect_dy)
+        & (rows < 118 + rect_dy)
+    )
+    circle_mask = (rows - (60 + circle_dy)) ** 2 + (columns - (170 + circle_dx)) ** 2 <= 18 ** 2
+    frame = np.where(rect_mask, rect_pattern, frame)
+    frame = np.where(circle_mask, circle_pattern, frame)
+    return np.clip(frame, 0, 255).astype(np.uint8)
+
+
+def draw_arrow(
+    draw: ImageDraw.ImageDraw,
+    x1: float,
+    y1: float,
+    x2: float,
+    y2: float,
+    color: tuple[int, int, int],
+    width: int = 2,
+) -> None:
+    """Draw a line with a small arrowhead on a PIL canvas."""
+
+    draw.line((x1, y1, x2, y2), fill=color, width=width)
+    dx, dy = x2 - x1, y2 - y1
+    length = float(np.hypot(dx, dy))
+    if length <= 1e-9:
+        return
+    unit_x, unit_y = dx / length, dy / length
+    head = 7
+    for angle_deg in (150.0, -150.0):
+        angle = np.deg2rad(angle_deg)
+        tip_x = x2 + head * (unit_x * np.cos(angle) - unit_y * np.sin(angle))
+        tip_y = y2 + head * (unit_x * np.sin(angle) + unit_y * np.cos(angle))
+        draw.line((x2, y2, tip_x, tip_y), fill=color, width=width)
+
+
+def draw_flow_arrows(
+    image: np.ndarray,
+    result: OpticalFlowResult,
+    step: int = 10,
+    scale: float = 4.0,
+) -> np.ndarray:
+    """Overlay confident flow vectors on a frame, colored by confidence."""
+
+    overlay = Image.fromarray(to_uint8(image)).convert("RGB")
+    draw = ImageDraw.Draw(overlay)
+    height, width = image.shape
+    for row in range(step // 2, height, step):
+        for column in range(step // 2, width, step):
+            if not result.valid[row, column]:
+                continue
+            u, v = result.flow[row, column]
+            if float(np.hypot(u, v)) < 0.4:
+                continue
+            color = (38, 174, 96) if result.confidence[row, column] > 20.0 else (232, 140, 50)
+            draw_arrow(draw, column, row, column + scale * u, row + scale * v, color)
+    return np.asarray(overlay)
+
+
+def optical_flow_reference_image(size: int = 256) -> Image.Image:
+    """Render frame A beside frame B with the recovered optical flow."""
+
+    frame_a = optical_flow_frame(size, 0, 0, 0, 0)
+    frame_b = optical_flow_frame(size, 1, 1, -1, 1)
+    result = lucas_kanade_flow(frame_a, frame_b, window_size=15)
+    with_flow = draw_flow_arrows(frame_b, result)
+    canvas = Image.new("RGB", (2 * size, size + 30), "white")
+    canvas.paste(Image.fromarray(frame_a).convert("RGB"), (0, 30))
+    canvas.paste(Image.fromarray(with_flow), (size, 30))
+    draw = ImageDraw.Draw(canvas)
+    font = ImageFont.load_default()
+    draw.text((8, 9), "Frame A", fill="black", font=font)
+    draw.text((size + 8, 9), "Frame B + Lucas-Kanade flow", fill="black", font=font)
+    return canvas
+
+
+def save_flow_tracking_animation(path: Path, size: int = 256, steps: int = 12) -> None:
+    """Animate a moving rectangle and circle with flow arrows on each frame."""
+
+    font = ImageFont.load_default()
+    frames: list[Image.Image] = []
+    previous = optical_flow_frame(size, 0, 0, 0, 0)
+    for index in range(1, steps):
+        rect_dx = int(round(18 * index / (steps - 1)))
+        rect_dy = int(round(12 * index / (steps - 1)))
+        circle_dx = -int(round(14 * index / (steps - 1)))
+        circle_dy = int(round(8 * index / (steps - 1)))
+        current = optical_flow_frame(size, rect_dx, rect_dy, circle_dx, circle_dy)
+        result = lucas_kanade_flow(previous, current, window_size=15)
+        with_flow = draw_flow_arrows(current, result)
+        frame = Image.new("RGB", (size, size + 30), "white")
+        frame.paste(Image.fromarray(with_flow), (0, 30))
+        draw = ImageDraw.Draw(frame)
+        draw.text((8, 9), f"Tracking frame {index:02d}", fill="black", font=font)
+        frames.append(frame)
+        previous = current
+
+    frames[0].save(
+        path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=130,
         loop=0,
         optimize=True,
         disposal=2,
@@ -360,6 +552,25 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         source_xy, destination_xy, threshold=2.0, max_iterations=500, seed=11
     )
     stereo_geometry, triangulated_depth = multiview_reference_images()
+    road = road_scene()
+    road_edges = canny(road, low_threshold=30, high_threshold=85, gaussian_size=5, sigma=1.4)
+    road_hough = hough_lines(
+        road_edges,
+        num_peaks=8,
+        threshold_rel=0.35,
+        min_support=30,
+    )
+    square = np.ones((3, 3), dtype=bool)
+    morphology_input = morphology_scene()
+    morphology_images = {
+        "1. Input: specks, hole, gap": morphology_input,
+        "2. Erosion": erode(morphology_input),
+        "3. Dilation": dilate(morphology_input),
+        "4. Opening (removes specks)": opening(morphology_input, square),
+        "5. Closing (fills gap)": closing(morphology_input, square),
+        "6. Opening + closing cleanup": closing(opening(morphology_input, square), square),
+    }
+    flow_reference = optical_flow_reference_image()
 
     images: dict[str, Image.Image] = {
         "chapter01_input.png": Image.fromarray(source),
@@ -410,6 +621,15 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         ),
         "chapter05_epipolar_geometry.png": stereo_geometry,
         "chapter05_triangulated_depth.png": triangulated_depth,
+        "chapter06_hough_lines.png": labelled_grid(
+            {
+                "Road scene input": road,
+                "Canny edges": road_edges,
+                "Hough line segments": draw_hough_overlay(road, road_hough),
+            }
+        ),
+        "chapter06_morphology.png": labelled_grid(morphology_images),
+        "chapter07_optical_flow.png": flow_reference,
     }
 
     paths = []
@@ -420,6 +640,9 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     animation_path = output_dir / "chapter03_harris_window.gif"
     save_harris_window_animation(corner_source, harris, animation_path)
     paths.append(animation_path)
+    flow_animation_path = output_dir / "chapter07_flow_tracking.gif"
+    save_flow_tracking_animation(flow_animation_path)
+    paths.append(flow_animation_path)
     return paths
 
 

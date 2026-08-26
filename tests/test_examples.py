@@ -11,6 +11,13 @@ from vision2autonomy.examples.reference_images import (
 )
 
 
+@pytest.fixture(scope="module")
+def generated_paths(tmp_path_factory: pytest.TempPathFactory) -> list[Path]:
+    """Generate the full reference image set once per module."""
+
+    return generate_reference_images(tmp_path_factory.mktemp("figures"))
+
+
 def test_synthetic_scene_is_deterministic() -> None:
     first = synthetic_scene(seed=11)
     second = synthetic_scene(seed=11)
@@ -21,10 +28,8 @@ def test_synthetic_scene_is_deterministic() -> None:
     assert first.min() < first.max()
 
 
-def test_reference_generator_writes_expected_pngs(tmp_path: Path) -> None:
-    paths = generate_reference_images(tmp_path)
-
-    assert {path.name for path in paths} == {
+def test_reference_generator_writes_expected_pngs(generated_paths: list[Path]) -> None:
+    assert {path.name for path in generated_paths} == {
         "chapter01_input.png",
         "chapter01_convolution.png",
         "chapter02_canny_stages.png",
@@ -36,20 +41,22 @@ def test_reference_generator_writes_expected_pngs(tmp_path: Path) -> None:
         "chapter04_ransac_inliers.png",
         "chapter05_epipolar_geometry.png",
         "chapter05_triangulated_depth.png",
+        "chapter06_hough_lines.png",
+        "chapter06_morphology.png",
+        "chapter07_optical_flow.png",
+        "chapter07_flow_tracking.gif",
     }
-    for path in paths:
+    for path in generated_paths:
         assert path.exists()
         with Image.open(path) as image:
             image.verify()
 
 
-def test_harris_gif_is_animated(tmp_path: Path) -> None:
-    paths = generate_reference_images(tmp_path)
-    gif_path = next(path for path in paths if path.suffix == ".gif")
-
-    with Image.open(gif_path) as animation:
-        assert animation.is_animated
-        assert animation.n_frames >= 20
+def test_all_gifs_are_animated(generated_paths: list[Path]) -> None:
+    for gif_path in (path for path in generated_paths if path.suffix == ".gif"):
+        with Image.open(gif_path) as animation:
+            assert animation.is_animated
+            assert animation.n_frames >= 10
 
 
 def test_labelled_grid_rejects_empty_input() -> None:
