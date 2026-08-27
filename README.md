@@ -41,6 +41,16 @@ Theory · NumPy from scratch · Reproducible experiments · Automated tests · B
       <br><sub><b>Chapter 07:</b> flow vectors track a moving rectangle and circle</sub>
     </td>
   </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/assets/chapter08_calibration_targets.png" alt="Synthetic checkerboard calibration views" />
+      <br><sub><b>Chapter 08:</b> Zhang calibration recovers focal length and lens distortion</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/assets/chapter08_distortion_correction.png" alt="Distorted checkerboard corrected with the estimated model" />
+      <br><sub><b>Chapter 08:</b> undistortion straightens the grid with the recovered parameters</sub>
+    </td>
+  </tr>
 </table>
 
 ## 📚 Contents
@@ -99,8 +109,9 @@ Every topic follows the same loop:
 | 05 | Pinhole projection, fundamental matrix, epipolar geometry, triangulation | ✅ Complete | [Tutorial](chapters/05_multiview_geometry/README.md) · [Depth result](docs/assets/chapter05_triangulated_depth.png) |
 | 06 | Hough line detection and binary morphology | ✅ Complete | [Tutorial](chapters/06_hough_morphology/README.md) · [Lines](docs/assets/chapter06_hough_lines.png) · [Morphology](docs/assets/chapter06_morphology.png) |
 | 07 | Lucas-Kanade optical flow and motion cues | ✅ Complete | [Tutorial](chapters/07_optical_flow/README.md) · [Flow](docs/assets/chapter07_optical_flow.png) · [GIF](docs/assets/chapter07_flow_tracking.gif) |
-| 08 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
-| 09 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 08 | Zhang camera calibration, lens distortion, and undistortion | ✅ Complete | [Tutorial](chapters/08_camera_calibration/README.md) · [Correction](docs/assets/chapter08_distortion_correction.png) · [GIF](docs/assets/chapter08_undistort.gif) |
+| 09 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 10 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 
 > A phase is marked complete only when code, documentation, reference images, and tests are present. Plans are not presented as achievements.
 
@@ -114,7 +125,7 @@ Every topic follows the same loop:
 
 Convolution stabilizes pixels, edges propose lanes and contours, corners become repeatable landmarks, cross-frame matching supports motion estimation, and stereo disparity plus triangulation recover distance. Every chapter now includes an autonomous-driving role and a concrete failure case so the mathematics has a visible purpose.
 
-Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, stereo depth, Hough line voting, and Lucas-Kanade optical flow.
+Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, stereo depth, Hough line voting, Lucas-Kanade optical flow, and a lens-distortion calibration workbench.
 
 ```bash
 git clone https://github.com/woofww/Vision2Autonomy.git

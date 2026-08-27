@@ -35,7 +35,7 @@ def parse_site() -> SiteParser:
 
 def test_interactive_site_has_required_labs() -> None:
     parser = parse_site()
-    assert {"convolution-lab", "canny-lab", "harris-lab", "matching-lab", "stereo-lab", "hough-lab", "flow-lab"} <= parser.ids
+    assert {"convolution-lab", "canny-lab", "harris-lab", "matching-lab", "stereo-lab", "hough-lab", "flow-lab", "calib-lab"} <= parser.ids
     assert "driving-map-title" in parser.ids
 
 

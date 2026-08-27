@@ -664,3 +664,95 @@ function renderFlowLab() {
   document.querySelector(`#${id}`).addEventListener("input", renderFlowLab);
 });
 renderFlowLab();
+// ---------- Calibration distortion lab ----------
+function calibDistort(x, y, k1, k2, p1, p2) {
+  const r2 = x * x + y * y;
+  const radial = 1 + k1 * r2 + k2 * r2 * r2;
+  return [
+    x * radial + 2 * p1 * x * y + p2 * (r2 + 2 * x * x),
+    y * radial + p1 * (r2 + 2 * y * y) + 2 * p2 * x * y
+  ];
+}
+
+function drawCalibGrid(canvas, k1, k2, p1, p2, corrected) {
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  const scale = Math.min(width, height) * 0.32;
+  const cx = width / 2;
+  const cy = height / 2;
+  const cell = 0.23;
+  const cols = 7;
+  const rows = 5;
+  const map = corrected
+    ? (x, y) => [x, y]
+    : (x, y) => calibDistort(x, y, k1, k2, p1, p2);
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const x0 = (col - cols / 2) * cell;
+      const y0 = (row - rows / 2) * cell;
+      const corners = [
+        map(x0, y0),
+        map(x0 + cell, y0),
+        map(x0 + cell, y0 + cell),
+        map(x0, y0 + cell)
+      ];
+      ctx.beginPath();
+      ctx.moveTo(cx + corners[0][0] * scale, cy + corners[0][1] * scale);
+      for (let i = 1; i < corners.length; i += 1) {
+        ctx.lineTo(cx + corners[i][0] * scale, cy + corners[i][1] * scale);
+      }
+      ctx.closePath();
+      ctx.fillStyle = (col + row) % 2 === 0 ? "#f4f6f3" : "#22302d";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(120, 134, 128, 0.45)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  ctx.strokeStyle = "#2f6f63";
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i <= cols; i += 1) {
+    const x = (i - cols / 2) * cell;
+    ctx.beginPath();
+    for (let step = 0; step <= 48; step += 1) {
+      const y = (-rows / 2 + (step / 48) * rows) * cell;
+      const [dx, dy] = map(x, y);
+      if (step === 0) ctx.moveTo(cx + dx * scale, cy + dy * scale);
+      else ctx.lineTo(cx + dx * scale, cy + dy * scale);
+    }
+    ctx.stroke();
+  }
+  for (let i = 0; i <= rows; i += 1) {
+    const y = (i - rows / 2) * cell;
+    ctx.beginPath();
+    for (let step = 0; step <= 48; step += 1) {
+      const x = (-cols / 2 + (step / 48) * cols) * cell;
+      const [dx, dy] = map(x, y);
+      if (step === 0) ctx.moveTo(cx + dx * scale, cy + dy * scale);
+      else ctx.lineTo(cx + dx * scale, cy + dy * scale);
+    }
+    ctx.stroke();
+  }
+}
+
+function renderCalibrationLab() {
+  const k1 = Number(document.querySelector("#calib-k1").value);
+  const k2 = Number(document.querySelector("#calib-k2").value);
+  const p1 = Number(document.querySelector("#calib-p1").value);
+  const p2 = Number(document.querySelector("#calib-p2").value);
+  document.querySelector("#calib-k1-value").textContent = k1.toFixed(2);
+  document.querySelector("#calib-k2-value").textContent = k2.toFixed(2);
+  document.querySelector("#calib-p1-value").textContent = p1.toFixed(3);
+  document.querySelector("#calib-p2-value").textContent = p2.toFixed(3);
+  drawCalibGrid(document.querySelector("#calib-distorted-canvas"), k1, k2, p1, p2, false);
+  drawCalibGrid(document.querySelector("#calib-corrected-canvas"), k1, k2, p1, p2, true);
+}
+
+["calib-k1", "calib-k2", "calib-p1", "calib-p2"].forEach((id) => {
+  document.querySelector(`#${id}`).addEventListener("input", renderCalibrationLab);
+});
+renderCalibrationLab();
