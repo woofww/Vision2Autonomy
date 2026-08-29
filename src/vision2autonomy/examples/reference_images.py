@@ -1,4 +1,4 @@
-"""Generate deterministic reference images used by Chapters 01 through 08.
+"""Generate deterministic reference images used by Chapters 01 through 09.
 
 Run after installing the project:
 
@@ -35,6 +35,7 @@ from vision2autonomy.geometry import (
     planar_object_points,
     project_points,
     project_points_3d,
+    ransac_pnp,
     triangulate_points,
     undistort_image,
     undistort_points,
@@ -814,6 +815,147 @@ def save_undistortion_animation(
         disposal=2,
     )
 
+
+def _yaw_rotation(angle_degrees: float) -> np.ndarray:
+    """Return a world-to-camera rotation around the vertical Y axis."""
+
+    angle = np.radians(angle_degrees)
+    cosine, sine = np.cos(angle), np.sin(angle)
+    return np.array(
+        [[cosine, 0.0, sine], [0.0, 1.0, 0.0], [-sine, 0.0, cosine]]
+    )
+
+
+def pnp_teaching_assets() -> tuple[Image.Image, Image.Image]:
+    """Render deterministic 3-D/2-D matches and the recovered camera pose."""
+
+    intrinsics = np.array(
+        [[520.0, 0.0, 320.0], [0.0, 520.0, 180.0], [0.0, 0.0, 1.0]]
+    )
+    rng = np.random.default_rng(19)
+    # A mixture of road-surface markings and elevated signs/lamp features.
+    # The height variation matters: a nearly planar set makes general PnP DLT
+    # ill-conditioned even though a floating-point rank check may say rank 3.
+    road_marks = rng.uniform([-3.8, -1.1, 7.5], [3.8, -0.5, 22.0], size=(18, 3))
+    elevated = rng.uniform([-4.0, 0.2, 8.0], [4.0, 3.2, 22.5], size=(18, 3))
+    world = np.vstack((road_marks, elevated))
+    rotation = _yaw_rotation(-4.0)
+    true_center = np.array([0.8, 0.1, 0.4])
+    translation = -rotation @ true_center
+    clean = project_points(world, intrinsics, rotation, translation)
+    observed = clean + rng.normal(0.0, 0.3, clean.shape)
+    outliers = np.array([3, 10, 14, 27, 33])
+    observed[outliers] += np.array(
+        [[58.0, -35.0], [-52.0, 44.0], [61.0, 31.0], [-48.0, -39.0], [55.0, 38.0]]
+    )
+    result = ransac_pnp(
+        world, observed, intrinsics, threshold=3.5, max_iterations=1200, seed=23
+    )
+    predicted = project_points(
+        world, intrinsics, result.rotation, result.translation
+    )
+
+    image = Image.new("RGB", (640, 390), (242, 246, 244))
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.load_default()
+    draw.text((12, 10), "PnP: observed landmarks -> recovered pose -> reprojection", fill=(24, 33, 31), font=font)
+    draw.polygon(((205, 370), (435, 370), (380, 115), (260, 115)), fill=(218, 224, 220))
+    draw.line((270, 370, 300, 115), fill=(255, 255, 255), width=3)
+    draw.line((370, 370, 340, 115), fill=(255, 255, 255), width=3)
+    for index, (measurement, estimate) in enumerate(zip(observed, predicted)):
+        color = (49, 145, 101) if result.inliers[index] else (220, 65, 65)
+        mx, my = measurement
+        px, py = estimate
+        draw.line((mx, my + 30, px, py + 30), fill=color, width=2)
+        draw.ellipse((mx - 4, my + 26, mx + 4, my + 34), outline=color, width=2)
+        draw.ellipse((px - 2, py + 28, px + 2, py + 32), fill=(24, 33, 31))
+    draw.text((12, 365), "ring = observed   dot = reprojection   green = inlier   red = rejected", fill=(99, 112, 108), font=font)
+
+    center = -result.rotation.T @ result.translation
+    top = Image.new("RGB", (560, 390), (247, 249, 248))
+    top_draw = ImageDraw.Draw(top)
+    top_draw.text((12, 10), "Recovered camera pose: top view (X-Z)", fill=(24, 33, 31), font=font)
+    origin_x, bottom_y = 280, 350
+    scale_x, scale_z = 55.0, 13.5
+    top_draw.line((35, bottom_y, 525, bottom_y), fill=(99, 112, 108), width=2)
+    top_draw.line((origin_x, 45, origin_x, bottom_y), fill=(99, 112, 108), width=2)
+    for index, point in enumerate(world):
+        x = origin_x + point[0] * scale_x
+        y = bottom_y - point[2] * scale_z
+        color = (49, 145, 101) if result.inliers[index] else (220, 65, 65)
+        top_draw.ellipse((x - 4, y - 4, x + 4, y + 4), fill=color)
+    camera_x = origin_x + center[0] * scale_x
+    camera_y = bottom_y - center[2] * scale_z
+    top_draw.polygon(
+        ((camera_x, camera_y - 11), (camera_x - 9, camera_y + 9), (camera_x + 9, camera_y + 9)),
+        fill=(188, 105, 55),
+    )
+    heading = result.rotation.T @ np.array([0.0, 0.0, 1.0])
+    top_draw.line(
+        (
+            camera_x,
+            camera_y,
+            camera_x + heading[0] * 48,
+            camera_y - heading[2] * 48,
+        ),
+        fill=(188, 105, 55),
+        width=3,
+    )
+    position_error = float(np.linalg.norm(center - true_center))
+    median_error = float(np.median(result.errors[result.inliers]))
+    top_draw.text((12, 360), f"camera center error {position_error:.3f} m   median reprojection {median_error:.2f} px", fill=(49, 95, 87), font=font)
+    return image, top
+
+
+def save_pnp_motion_animation(path: Path, steps: int = 14) -> None:
+    """Animate how forward camera motion changes landmark projections."""
+
+    intrinsics = np.array(
+        [[420.0, 0.0, 230.0], [0.0, 420.0, 145.0], [0.0, 0.0, 1.0]]
+    )
+    world = np.array(
+        [[-3.0, -0.7, 9.0], [3.0, -0.7, 9.0], [-3.4, 0.4, 14.0], [3.4, 0.4, 14.0],
+         [-3.8, 1.2, 20.0], [3.8, 1.2, 20.0], [-1.2, -0.3, 17.0], [1.2, -0.3, 17.0]]
+    )
+    font = ImageFont.load_default()
+    frames: list[Image.Image] = []
+    fractions = list(np.linspace(0.0, 1.0, steps)) + list(np.linspace(1.0, 0.0, steps))
+    for fraction in fractions:
+        center = np.array([0.8 * np.sin(fraction * np.pi), 0.0, 4.0 * fraction])
+        rotation = _yaw_rotation(-5.0 + 10.0 * fraction)
+        translation = -rotation @ center
+        pixels = project_points(world, intrinsics, rotation, translation)
+        frame = Image.new("RGB", (720, 320), (247, 249, 248))
+        draw = ImageDraw.Draw(frame)
+        draw.text((12, 10), f"camera center = ({center[0]:.1f}, 0.0, {center[2]:.1f}) m", fill=(24, 33, 31), font=font)
+        draw.rectangle((10, 30, 470, 320), fill=(232, 237, 234))
+        draw.polygon(((145, 319), (335, 319), (285, 80), (195, 80)), fill=(205, 213, 208))
+        for index, (x, y) in enumerate(pixels):
+            color = (49, 145, 101) if index % 2 == 0 else (188, 105, 55)
+            draw.ellipse((x - 5, y + 25, x + 5, y + 35), fill=color, outline="white")
+        origin_x, bottom_y = 590, 292
+        draw.line((500, bottom_y, 705, bottom_y), fill=(99, 112, 108), width=2)
+        draw.line((origin_x, 42, origin_x, bottom_y), fill=(99, 112, 108), width=2)
+        for point in world:
+            x = origin_x + point[0] * 25
+            y = bottom_y - point[2] * 10
+            draw.ellipse((x - 3, y - 3, x + 3, y + 3), fill=(49, 145, 101))
+        camera_x = origin_x + center[0] * 25
+        camera_y = bottom_y - center[2] * 10
+        draw.polygon(((camera_x, camera_y - 8), (camera_x - 7, camera_y + 7), (camera_x + 7, camera_y + 7)), fill=(188, 105, 55))
+        draw.text((515, 302), "top view: PnP recovers this pose", fill=(99, 112, 108), font=font)
+        frames.append(frame)
+    frames[0].save(
+        path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=110,
+        loop=0,
+        optimize=True,
+        disposal=2,
+    )
+
+
 def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     """Generate all committed reference images and return their paths."""
 
@@ -893,6 +1035,7 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     calib_scene, calib_result, calibration_targets, distortion_correction, reprojection_figure = (
         calibration_teaching_assets()
     )
+    pnp_correspondences, pnp_pose = pnp_teaching_assets()
 
     images: dict[str, Image.Image] = {
         "chapter01_input.png": Image.fromarray(source),
@@ -955,6 +1098,8 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         "chapter08_calibration_targets.png": calibration_targets,
         "chapter08_distortion_correction.png": distortion_correction,
         "chapter08_reprojection_errors.png": reprojection_figure,
+        "chapter09_pnp_correspondences.png": pnp_correspondences,
+        "chapter09_pose_top_view.png": pnp_pose,
     }
 
     paths = []
@@ -971,6 +1116,9 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     calibration_gif_path = output_dir / "chapter08_undistort.gif"
     save_undistortion_animation(calibration_gif_path, calib_scene, calib_result)
     paths.append(calibration_gif_path)
+    pnp_gif_path = output_dir / "chapter09_pose_motion.gif"
+    save_pnp_motion_animation(pnp_gif_path)
+    paths.append(pnp_gif_path)
     return paths
 
 

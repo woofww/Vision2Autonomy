@@ -49,6 +49,9 @@ def test_reference_generator_writes_expected_pngs(generated_paths: list[Path]) -
         "chapter08_distortion_correction.png",
         "chapter08_reprojection_errors.png",
         "chapter08_undistort.gif",
+        "chapter09_pnp_correspondences.png",
+        "chapter09_pose_top_view.png",
+        "chapter09_pose_motion.gif",
     }
     for path in generated_paths:
         assert path.exists()

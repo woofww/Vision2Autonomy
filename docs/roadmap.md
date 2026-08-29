@@ -28,6 +28,7 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 - Pinhole projection and coordinate transforms (complete)
 - Epipolar geometry and the fundamental matrix (complete)
 - Stereo triangulation and depth sensitivity (complete)
+- PnP and robust camera-pose estimation (complete) · [Chapter 09](../chapters/09_pnp_pose/README.md)
 - Visual odometry
 
 ## Phase 4 — Deep vision
