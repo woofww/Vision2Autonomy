@@ -18,6 +18,9 @@ MARKDOWN_LINK = re.compile(r"!?\[[^]]*]\(([^)]+)\)")
         ("chapters/03_harris_corners/README.md", "chapters/03_harris_corners/README.zh-CN.md"),
         ("chapters/04_feature_matching/README.md", "chapters/04_feature_matching/README.zh-CN.md"),
         ("chapters/05_multiview_geometry/README.md", "chapters/05_multiview_geometry/README.zh-CN.md"),
+        ("chapters/06_hough_morphology/README.md", "chapters/06_hough_morphology/README.zh-CN.md"),
+        ("chapters/07_optical_flow/README.md", "chapters/07_optical_flow/README.zh-CN.md"),
+        ("chapters/08_camera_calibration/README.md", "chapters/08_camera_calibration/README.zh-CN.md"),
         ("chapters/special_convolution/README.md", "chapters/special_convolution/README.zh-CN.md"),
     ],
 )

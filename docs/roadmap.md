@@ -18,12 +18,12 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 - Harris corners (complete)
 - Local patch description, nearest-neighbor matching, and ratio tests (complete)
 - Normalized DLT and RANSAC homography (complete)
-- Hough transforms and morphology
-- Optical flow and tracking
+- Hough transforms and morphology (complete)
+- Lucas-Kanade optical flow and tracking (complete)
 
 ## Phase 3 — Camera geometry
 
-- Camera calibration and distortion
+- Camera calibration and distortion (complete) · [Chapter 08](../chapters/08_camera_calibration/README.md)
 - Homographies and perspective transforms
 - Pinhole projection and coordinate transforms (complete)
 - Epipolar geometry and the fundamental matrix (complete)

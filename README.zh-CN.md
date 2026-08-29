@@ -31,6 +31,26 @@
       <br><sub><b>第二章：</b>从输入图到 Canny 边缘图</sub>
     </td>
   </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/assets/chapter06_hough_lines.png" alt="合成道路场景中的 Hough 直线检测" />
+      <br><sub><b>第六章：</b>Hough 投票与形态学清理车道类场景</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/assets/chapter07_optical_flow.png" alt="合成场景上的 Lucas-Kanade 光流箭头" />
+      <br><sub><b>第七章：</b>光流向量跟踪移动的矩形与圆形</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/assets/chapter08_calibration_targets.png" alt="合成棋盘格标定视图" />
+      <br><sub><b>第八章：</b>Zhang 标定恢复焦距与镜头畸变</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/assets/chapter08_distortion_correction.png" alt="用估计模型校正畸变棋盘格" />
+      <br><sub><b>第八章：</b>用恢复出的参数去畸变，让网格重新变直</sub>
+    </td>
+  </tr>
 </table>
 
 ## 📚 目录
@@ -87,8 +107,11 @@
 | 03 | 结构张量、特征值、Harris 角点与 NMS | ✅ 已完成 | [中文教程](chapters/03_harris_corners/README.zh-CN.md) · [教学 GIF](docs/assets/chapter03_harris_window.gif) |
 | 04 | 补丁描述子、匹配、归一化 DLT 与 RANSAC | ✅ 已完成 | [中文教程](chapters/04_feature_matching/README.zh-CN.md) · [匹配结果](docs/assets/chapter04_ransac_inliers.png) |
 | 05 | 针孔投影、基础矩阵、对极几何与三角化 | ✅ 已完成 | [中文教程](chapters/05_multiview_geometry/README.zh-CN.md) · [深度结果](docs/assets/chapter05_triangulated_depth.png) |
-| 06 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
-| 07 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 06 | Hough 直线检测与二值形态学 | ✅ 已完成 | [中文教程](chapters/06_hough_morphology/README.zh-CN.md) · [直线](docs/assets/chapter06_hough_lines.png) · [形态学](docs/assets/chapter06_morphology.png) |
+| 07 | Lucas-Kanade 光流与运动线索 | ✅ 已完成 | [中文教程](chapters/07_optical_flow/README.zh-CN.md) · [光流](docs/assets/chapter07_optical_flow.png) · [GIF](docs/assets/chapter07_flow_tracking.gif) |
+| 08 | Zhang 相机标定、镜头畸变与去畸变 | ✅ 已完成 | [中文教程](chapters/08_camera_calibration/README.zh-CN.md) · [去畸变](docs/assets/chapter08_distortion_correction.png) · [GIF](docs/assets/chapter08_undistort.gif) |
+| 09 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 10 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 
 > 进度表只标记仓库中已经有代码、文档、执行图和测试的内容，不用计划冒充成果。
 
@@ -102,7 +125,7 @@
 
 卷积负责稳定像素，边缘提供车道和轮廓候选，角点形成可重复地标，跨帧匹配支持运动估计，双目视差与三角化恢复空间距离。每章都包含独立的“自动驾驶中的作用”与失效案例，帮助你带着目标学习，而不是孤立地背公式。
 
-不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny、Harris、RANSAC 和双目深度。
+不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny、Harris、RANSAC、双目深度、Hough 直线投票、Lucas-Kanade 光流和镜头畸变标定工作台。
 
 ### 1. 获取代码
 
