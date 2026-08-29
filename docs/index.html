@@ -64,7 +64,8 @@
           <li class="roadmap-card complete"><span>06</span><b>Hough 与形态学</b><small>直线投票、掩膜清理</small></li>
           <li class="roadmap-card complete"><span>07</span><b>光流与跟踪</b><small>Lucas-Kanade、运动场</small></li>
           <li class="roadmap-card complete"><span>08</span><b>相机标定与畸变</b><small>Zhang 标定、去畸变</small></li>
-          <li class="roadmap-card next"><span>09</span><b>视觉里程计</b><small>PnP、位姿估计、运动轨迹</small></li>
+          <li class="roadmap-card complete"><span>09</span><b>PnP 位姿估计</b><small>3D–2D、RANSAC、相机位置</small></li>
+          <li class="roadmap-card next"><span>10</span><b>视觉里程计</b><small>连续位姿、轨迹与漂移</small></li>
         </ol>
       </section>
 
@@ -88,6 +89,7 @@
             <li><span>06</span><div><b>Hough 与形态学</b><p>投票找回车道线，清理分割掩膜中的噪点与空洞。</p></div></li>
             <li><span>07</span><div><b>光流与跟踪</b><p>跨帧关联运动目标，并在去除自车运动后找出独立移动物体。</p></div></li>
             <li><span>08</span><div><b>相机标定</b><p>把像素换算成米，为测距、车道几何与多传感器融合提供统一坐标系。</p></div></li>
+            <li><span>09</span><div><b>PnP 位姿估计</b><p>把地图三维地标与当前像素对齐，恢复车辆相机的位置和朝向。</p></div></li>
           </ol>
         </div>
       </section>
@@ -310,12 +312,36 @@
               <figcaption>理想网格 · 去畸变的目标</figcaption>
             </figure>
           </div>
-        </article>      </section>
+        </article>
+
+        <article class="lab-card reverse" id="pnp-lab">
+          <div class="lab-copy">
+            <p class="lab-number">实验 09</p>
+            <h3>PnP 位姿与像素投影</h3>
+            <p>移动相机中心并改变偏航角，观察固定三维路标如何在图像中移动。PnP 做的是逆问题：从这些像素变化恢复右侧显示的相机位姿。</p>
+            <div class="calib-controls">
+              <label>横向位置 X <b id="pnp-x-value">0.0 m</b><input id="pnp-x" type="range" min="-2" max="2" step="0.1" value="0"></label>
+              <label>前向位置 Z <b id="pnp-z-value">0.0 m</b><input id="pnp-z" type="range" min="0" max="5" step="0.1" value="0"></label>
+              <label>偏航角 yaw <b id="pnp-yaw-value">0°</b><input id="pnp-yaw" type="range" min="-12" max="12" step="1" value="0"></label>
+            </div>
+            <div class="consensus-stats" aria-live="polite">
+              <div><strong id="pnp-visible-count">8</strong><span>可见地标</span></div>
+              <div><strong id="pnp-near-spread">—</strong><span>近处像素跨度</span></div>
+              <div><strong id="pnp-far-spread">—</strong><span>远处像素跨度</span></div>
+            </div>
+            <a class="text-link" href="https://github.com/woofww/Vision2Autonomy/blob/master/chapters/09_pnp_pose/README.zh-CN.md">阅读完整原理 →</a>
+          </div>
+          <div class="pnp-panel">
+            <canvas id="pnp-canvas" width="600" height="340" aria-label="相机位姿与三维地标像素投影"></canvas>
+            <p class="canvas-caption">左：相机图像 · 右：X–Z 俯视图</p>
+          </div>
+        </article>
+      </section>
 
       <section class="next-step section-shell">
         <p class="eyebrow">NEXT CHAPTER</p>
-        <h2>几何深度建立以后，怎样识别道路中的车辆、行人与车道？</h2>
-        <p>下一阶段进入深度学习视觉：从神经网络与卷积层开始，逐步走向检测、分割、跟踪和鸟瞰感知。</p>
+        <h2>单帧位姿有了，怎样把连续图像连接成车辆行驶轨迹？</h2>
+        <p>下一章把特征匹配、三角化和 PnP 串成视觉里程计，直面尺度、累计漂移与轨迹评估。</p>
         <a class="button primary" href="https://github.com/woofww/Vision2Autonomy">关注课程进度</a>
       </section>
     </main>

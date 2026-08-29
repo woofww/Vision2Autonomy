@@ -110,8 +110,10 @@ Every topic follows the same loop:
 | 06 | Hough line detection and binary morphology | ✅ Complete | [Tutorial](chapters/06_hough_morphology/README.md) · [Lines](docs/assets/chapter06_hough_lines.png) · [Morphology](docs/assets/chapter06_morphology.png) |
 | 07 | Lucas-Kanade optical flow and motion cues | ✅ Complete | [Tutorial](chapters/07_optical_flow/README.md) · [Flow](docs/assets/chapter07_optical_flow.png) · [GIF](docs/assets/chapter07_flow_tracking.gif) |
 | 08 | Zhang camera calibration, lens distortion, and undistortion | ✅ Complete | [Tutorial](chapters/08_camera_calibration/README.md) · [Correction](docs/assets/chapter08_distortion_correction.png) · [GIF](docs/assets/chapter08_undistort.gif) |
-| 09 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
-| 10 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 09 | Normalized DLT, PnP, RANSAC, and camera pose | ✅ Complete | [Tutorial](chapters/09_pnp_pose/README.md) · [Correspondences](docs/assets/chapter09_pnp_correspondences.png) · [GIF](docs/assets/chapter09_pose_motion.gif) |
+| 10 | Visual odometry, trajectory evaluation, and drift | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 11 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 12 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 
 > A phase is marked complete only when code, documentation, reference images, and tests are present. Plans are not presented as achievements.
 
@@ -125,7 +127,7 @@ Every topic follows the same loop:
 
 Convolution stabilizes pixels, edges propose lanes and contours, corners become repeatable landmarks, cross-frame matching supports motion estimation, and stereo disparity plus triangulation recover distance. Every chapter now includes an autonomous-driving role and a concrete failure case so the mathematics has a visible purpose.
 
-Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, stereo depth, Hough line voting, Lucas-Kanade optical flow, and a lens-distortion calibration workbench.
+Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, stereo depth, Hough line voting, Lucas-Kanade optical flow, lens distortion, and PnP camera pose.
 
 ```bash
 git clone https://github.com/woofww/Vision2Autonomy.git

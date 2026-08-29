@@ -756,3 +756,132 @@ function renderCalibrationLab() {
   document.querySelector(`#${id}`).addEventListener("input", renderCalibrationLab);
 });
 renderCalibrationLab();
+
+// ---------- PnP pose lab ----------
+const pnpLandmarks = [
+  [-3.0, -0.7, 8.5], [3.0, -0.7, 8.5],
+  [-3.4, 0.5, 13.0], [3.4, 0.5, 13.0],
+  [-3.8, 1.5, 19.0], [3.8, 1.5, 19.0],
+  [-1.2, 0.1, 16.0], [1.2, 0.1, 16.0],
+];
+
+function projectPnPPoint(point, centerX, centerZ, yawDegrees) {
+  const angle = yawDegrees * Math.PI / 180;
+  const cosine = Math.cos(angle);
+  const sine = Math.sin(angle);
+  const dx = point[0] - centerX;
+  const dz = point[2] - centerZ;
+  const cameraX = cosine * dx + sine * dz;
+  const cameraZ = -sine * dx + cosine * dz;
+  if (cameraZ <= 0.2) return null;
+  return {
+    x: 210 + 360 * cameraX / cameraZ,
+    y: 145 - 360 * point[1] / cameraZ,
+    depth: cameraZ,
+  };
+}
+
+function renderPnPLab() {
+  const canvas = document.querySelector("#pnp-canvas");
+  const ctx = canvas.getContext("2d");
+  const centerX = Number(document.querySelector("#pnp-x").value);
+  const centerZ = Number(document.querySelector("#pnp-z").value);
+  const yaw = Number(document.querySelector("#pnp-yaw").value);
+  document.querySelector("#pnp-x-value").textContent = `${centerX.toFixed(1)} m`;
+  document.querySelector("#pnp-z-value").textContent = `${centerZ.toFixed(1)} m`;
+  document.querySelector("#pnp-yaw-value").textContent = `${yaw}°`;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#e8eeeb";
+  ctx.fillRect(0, 0, 420, 310);
+  ctx.fillStyle = "#d0d8d4";
+  ctx.beginPath();
+  ctx.moveTo(100, 310);
+  ctx.lineTo(320, 310);
+  ctx.lineTo(258, 62);
+  ctx.lineTo(162, 62);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(155, 310);
+  ctx.lineTo(187, 62);
+  ctx.moveTo(265, 310);
+  ctx.lineTo(233, 62);
+  ctx.stroke();
+
+  const projected = pnpLandmarks
+    .map((point, index) => ({ point, index, pixel: projectPnPPoint(point, centerX, centerZ, yaw) }))
+    .filter((item) => item.pixel && item.pixel.x >= 0 && item.pixel.x <= 420 && item.pixel.y >= 0 && item.pixel.y <= 310);
+  projected.forEach(({ index, pixel }) => {
+    const radius = Math.max(3, 9 - pixel.depth * 0.25);
+    ctx.fillStyle = index % 2 === 0 ? "#319165" : "#bc6937";
+    ctx.beginPath();
+    ctx.arc(pixel.x, pixel.y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  ctx.fillStyle = "#18211f";
+  ctx.font = "12px ui-monospace, monospace";
+  ctx.fillText("camera image: fixed 3-D landmarks move in pixels", 12, 328);
+
+  const originX = 510;
+  const bottomY = 292;
+  ctx.strokeStyle = "#63706c";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(438, bottomY);
+  ctx.lineTo(590, bottomY);
+  ctx.moveTo(originX, 30);
+  ctx.lineTo(originX, bottomY);
+  ctx.stroke();
+  pnpLandmarks.forEach((point, index) => {
+    ctx.fillStyle = index % 2 === 0 ? "#319165" : "#bc6937";
+    ctx.beginPath();
+    ctx.arc(originX + point[0] * 18, bottomY - point[2] * 11, 3.5, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+  const cameraX = originX + centerX * 18;
+  const cameraY = bottomY - centerZ * 11;
+  ctx.fillStyle = "#bc6937";
+  ctx.beginPath();
+  ctx.moveTo(cameraX, cameraY - 9);
+  ctx.lineTo(cameraX - 8, cameraY + 8);
+  ctx.lineTo(cameraX + 8, cameraY + 8);
+  ctx.closePath();
+  ctx.fill();
+  const heading = (yaw + 90) * Math.PI / 180;
+  drawArrow(
+    ctx,
+    cameraX,
+    cameraY,
+    cameraX + Math.cos(heading) * 36,
+    cameraY - Math.sin(heading) * 36,
+    "#bc6937",
+    2,
+  );
+  ctx.fillStyle = "#63706c";
+  ctx.fillText("X–Z top view", 447, 328);
+
+  const near = pnpLandmarks.slice(0, 2)
+    .map((point) => projectPnPPoint(point, centerX, centerZ, yaw))
+    .filter(Boolean);
+  const far = pnpLandmarks.slice(4, 6)
+    .map((point) => projectPnPPoint(point, centerX, centerZ, yaw))
+    .filter(Boolean);
+  const spread = (pair) => pair.length === 2 ? Math.abs(pair[1].x - pair[0].x) : null;
+  const nearSpread = spread(near);
+  const farSpread = spread(far);
+  document.querySelector("#pnp-visible-count").textContent = String(projected.length);
+  document.querySelector("#pnp-near-spread").textContent = nearSpread === null ? "—" : `${nearSpread.toFixed(0)} px`;
+  document.querySelector("#pnp-far-spread").textContent = farSpread === null ? "—" : `${farSpread.toFixed(0)} px`;
+}
+
+["pnp-x", "pnp-z", "pnp-yaw"].forEach((id) => {
+  document.querySelector(`#${id}`).addEventListener("input", renderPnPLab);
+});
+renderPnPLab();
