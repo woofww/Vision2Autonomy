@@ -29,7 +29,7 @@ explanation, a from-scratch implementation, experiments, and automated tests.
 - Epipolar geometry and the fundamental matrix (complete)
 - Stereo triangulation and depth sensitivity (complete)
 - PnP and robust camera-pose estimation (complete) · [Chapter 09](../chapters/09_pnp_pose/README.md)
-- Visual odometry
+- Visual odometry, trajectory evaluation, and drift (complete) · [Chapter 10](../chapters/10_visual_odometry/README.md)
 
 ## Phase 4 — Deep vision
 

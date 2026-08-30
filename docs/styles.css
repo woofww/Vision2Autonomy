@@ -246,6 +246,8 @@ footer a { color: var(--accent-2); }
 .calib-panel figcaption { margin: 0; color: var(--muted); font-size: 12px; text-align: center; }
 .pnp-panel { display: grid; gap: 8px; justify-items: center; min-width: 0; }
 .pnp-panel canvas { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); touch-action: manipulation; }
+.vo-panel { display: grid; gap: 8px; justify-items: center; min-width: 0; }
+.vo-panel canvas { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); touch-action: manipulation; }
 @media (max-width: 680px) {
   .calib-panel { grid-template-columns: 1fr; }
 }
