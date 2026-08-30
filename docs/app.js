@@ -885,3 +885,111 @@ function renderPnPLab() {
   document.querySelector(`#${id}`).addEventListener("input", renderPnPLab);
 });
 renderPnPLab();
+
+// ---------- Visual-odometry drift lab ----------
+function buildDriftTrajectory(steps, yawBiasDegrees, noiseMagnitude) {
+  const truth = [{ x: 0, z: 0 }];
+  const estimate = [{ x: 0, z: 0 }];
+  let heading = 0;
+  for (let index = 1; index <= steps; index += 1) {
+    truth.push({ x: 0, z: index * 0.8 });
+    heading += yawBiasDegrees * Math.PI / 180;
+    const deterministicXNoise = Math.sin(index * 12.9898) * noiseMagnitude;
+    const deterministicZNoise = Math.sin(index * 7.233 + 1.7) * noiseMagnitude;
+    const previous = estimate[estimate.length - 1];
+    estimate.push({
+      x: previous.x + Math.sin(heading) * 0.8 + deterministicXNoise,
+      z: previous.z + Math.cos(heading) * 0.8 + deterministicZNoise,
+    });
+  }
+  return { truth, estimate, heading };
+}
+
+function renderVODriftLab() {
+  const yawBias = Number(document.querySelector("#vo-yaw").value);
+  const steps = Number(document.querySelector("#vo-steps").value);
+  const noise = Number(document.querySelector("#vo-noise").value);
+  document.querySelector("#vo-yaw-value").textContent = `${yawBias.toFixed(2)}°`;
+  document.querySelector("#vo-steps-value").textContent = String(steps);
+  document.querySelector("#vo-noise-value").textContent = `${noise.toFixed(2)} m`;
+
+  const trajectory = buildDriftTrajectory(steps, yawBias, noise);
+  const canvas = document.querySelector("#vo-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#e8eeeb";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const all = [...trajectory.truth, ...trajectory.estimate];
+  const xs = all.map((point) => point.x);
+  const zs = all.map((point) => point.z);
+  const minX = Math.min(...xs, -1);
+  const maxX = Math.max(...xs, 1);
+  const minZ = Math.min(...zs, 0);
+  const maxZ = Math.max(...zs, 1);
+  const padding = 34;
+  const spanX = Math.max(maxX - minX, 2);
+  const spanZ = Math.max(maxZ - minZ, 2);
+  const scale = Math.min(
+    (canvas.width - 2 * padding) / spanX,
+    (canvas.height - 2 * padding) / spanZ,
+  );
+  const offsetX = canvas.width / 2 - ((minX + maxX) / 2) * scale;
+  const map = (point) => ({
+    x: offsetX + point.x * scale,
+    y: canvas.height - padding - (point.z - minZ) * scale,
+  });
+
+  ctx.strokeStyle = "rgba(99, 112, 108, 0.25)";
+  ctx.lineWidth = 1;
+  for (let index = 0; index < trajectory.truth.length; index += Math.max(1, Math.floor(steps / 12))) {
+    const truthPoint = map(trajectory.truth[index]);
+    const estimatePoint = map(trajectory.estimate[index]);
+    ctx.beginPath();
+    ctx.moveTo(truthPoint.x, truthPoint.y);
+    ctx.lineTo(estimatePoint.x, estimatePoint.y);
+    ctx.stroke();
+  }
+
+  function drawTrack(points, color, width) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    points.forEach((point, index) => {
+      const screen = map(point);
+      if (index === 0) ctx.moveTo(screen.x, screen.y);
+      else ctx.lineTo(screen.x, screen.y);
+    });
+    ctx.stroke();
+  }
+
+  drawTrack(trajectory.truth, "#319165", 4);
+  drawTrack(trajectory.estimate, "#bc6937", 3);
+  const truthEnd = map(trajectory.truth[trajectory.truth.length - 1]);
+  const estimateEnd = map(trajectory.estimate[trajectory.estimate.length - 1]);
+  ctx.fillStyle = "#319165";
+  ctx.beginPath();
+  ctx.arc(truthEnd.x, truthEnd.y, 5, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.fillStyle = "#bc6937";
+  ctx.beginPath();
+  ctx.arc(estimateEnd.x, estimateEnd.y, 5, 0, 2 * Math.PI);
+  ctx.fill();
+
+  const squaredErrors = trajectory.truth.map((point, index) => {
+    const dx = trajectory.estimate[index].x - point.x;
+    const dz = trajectory.estimate[index].z - point.z;
+    return dx * dx + dz * dz;
+  });
+  const ate = Math.sqrt(squaredErrors.reduce((sum, value) => sum + value, 0) / squaredErrors.length);
+  const final = trajectory.estimate[trajectory.estimate.length - 1];
+  document.querySelector("#vo-final-drift").textContent = `${Math.abs(final.x).toFixed(2)} m`;
+  document.querySelector("#vo-ate").textContent = `${ate.toFixed(2)} m`;
+  document.querySelector("#vo-heading-error").textContent = `${Math.abs(yawBias * steps).toFixed(1)}°`;
+}
+
+["vo-yaw", "vo-steps", "vo-noise"].forEach((id) => {
+  document.querySelector(`#${id}`).addEventListener("input", renderVODriftLab);
+});
+renderVODriftLab();

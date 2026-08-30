@@ -111,7 +111,7 @@
 | 07 | Lucas-Kanade 光流与运动线索 | ✅ 已完成 | [中文教程](chapters/07_optical_flow/README.zh-CN.md) · [光流](docs/assets/chapter07_optical_flow.png) · [GIF](docs/assets/chapter07_flow_tracking.gif) |
 | 08 | Zhang 相机标定、镜头畸变与去畸变 | ✅ 已完成 | [中文教程](chapters/08_camera_calibration/README.zh-CN.md) · [去畸变](docs/assets/chapter08_distortion_correction.png) · [GIF](docs/assets/chapter08_undistort.gif) |
 | 09 | 归一化 DLT、PnP、RANSAC 与相机位姿 | ✅ 已完成 | [中文教程](chapters/09_pnp_pose/README.zh-CN.md) · [对应关系](docs/assets/chapter09_pnp_correspondences.png) · [GIF](docs/assets/chapter09_pose_motion.gif) |
-| 10 | 视觉里程计、轨迹评估与漂移 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
+| 10 | PnP 视觉里程计、位姿累积、ATE 与漂移 | ✅ 已完成 | [中文教程](chapters/10_visual_odometry/README.zh-CN.md) · [轨迹](docs/assets/chapter10_vo_trajectory.png) · [GIF](docs/assets/chapter10_vo_trajectory.gif) |
 | 11 | 分类、检测、分割、单目深度 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 | 12 | 车道、可行驶区域、目标跟踪、驾驶感知整合 | 🗓️ 规划中 | [路线图](docs/roadmap.zh-CN.md) |
 
@@ -127,7 +127,7 @@
 
 卷积负责稳定像素，边缘提供车道和轮廓候选，角点形成可重复地标，跨帧匹配支持运动估计，双目视差与三角化恢复空间距离。每章都包含独立的“自动驾驶中的作用”与失效案例，帮助你带着目标学习，而不是孤立地背公式。
 
-不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny、Harris、RANSAC、双目深度、Hough 直线投票、Lucas-Kanade 光流、镜头畸变和 PnP 位姿工作台。
+不安装任何依赖也可以先打开 [GitHub Pages 交互式实验室](https://woofww.github.io/Vision2Autonomy/)，直接体验卷积、Canny、Harris、RANSAC、双目深度、Hough 直线投票、Lucas-Kanade 光流、镜头畸变、PnP 位姿和视觉里程计漂移。
 
 ### 1. 获取代码
 

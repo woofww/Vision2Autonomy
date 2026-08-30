@@ -1,4 +1,4 @@
-"""Generate deterministic reference images used by Chapters 01 through 09.
+"""Generate deterministic reference images used by Chapters 01 through 10.
 
 Run after installing the project:
 
@@ -29,12 +29,14 @@ from vision2autonomy.features.matching import (
 from vision2autonomy.image.convolution import convolve2d
 from vision2autonomy.image.filters import gaussian_blur
 from vision2autonomy.geometry import (
+    absolute_trajectory_error,
     calibrate_camera,
     camera_matrix,
     estimate_fundamental,
     planar_object_points,
     project_points,
     project_points_3d,
+    pnp_odometry,
     ransac_pnp,
     triangulate_points,
     undistort_image,
@@ -956,6 +958,198 @@ def save_pnp_motion_animation(path: Path, steps: int = 14) -> None:
     )
 
 
+def visual_odometry_scene():
+    """Create a metric landmark track and recover a short vehicle trajectory."""
+
+    intrinsics = np.array(
+        [[620.0, 0.0, 320.0], [0.0, 620.0, 180.0], [0.0, 0.0, 1.0]]
+    )
+    rng = np.random.default_rng(41)
+    road = rng.uniform([-5.2, -1.2, 7.5], [5.2, -0.45, 31.0], size=(36, 3))
+    structures = rng.uniform([-5.5, 0.1, 8.0], [5.5, 3.6, 32.0], size=(34, 3))
+    landmarks = np.vstack((road, structures))
+    frame_count = 11
+    progress = np.linspace(0.0, 1.0, frame_count)
+    centers = np.column_stack(
+        (
+            0.8 * np.sin(progress * 1.4),
+            np.zeros(frame_count),
+            6.2 * progress,
+        )
+    )
+    observations: list[np.ndarray] = []
+    for frame_index, center in enumerate(centers):
+        rotation = _yaw_rotation(-4.5 * progress[frame_index])
+        translation = -rotation @ center
+        pixels = project_points(landmarks, intrinsics, rotation, translation)
+        pixels += rng.normal(0.0, 0.22, pixels.shape)
+        outliers = np.array(
+            [
+                (frame_index * 5 + 3) % len(landmarks),
+                (frame_index * 7 + 17) % len(landmarks),
+                (frame_index * 11 + 29) % len(landmarks),
+            ]
+        )
+        pixels[outliers] += rng.uniform(38.0, 68.0, (len(outliers), 2)) * rng.choice(
+            [-1.0, 1.0], (len(outliers), 2)
+        )
+        if frame_index >= 3:
+            pixels[frame_index : frame_index + 4] = np.nan
+        observations.append(pixels)
+    result = pnp_odometry(
+        landmarks,
+        observations,
+        intrinsics,
+        threshold=3.5,
+        max_iterations=700,
+        seed=53,
+    )
+    return centers, result
+
+
+def draw_vo_trajectory(reference: np.ndarray, estimated: np.ndarray) -> Image.Image:
+    """Render reference and estimated camera centers in an X-Z top view."""
+
+    canvas = Image.new("RGB", (680, 420), (247, 249, 248))
+    draw = ImageDraw.Draw(canvas)
+    font = ImageFont.load_default()
+    draw.text(
+        (14, 12),
+        "Visual odometry: triangulated landmarks + robust PnP",
+        fill=(24, 33, 31),
+        font=font,
+    )
+    left, right, top, bottom = 70, 645, 55, 360
+    draw.rounded_rectangle(
+        (left, top, right, bottom), radius=12, fill=(232, 237, 234)
+    )
+    all_points = np.vstack((reference[:, [0, 2]], estimated[:, [0, 2]]))
+    minimum = all_points.min(axis=0) - np.array([0.45, 0.35])
+    maximum = all_points.max(axis=0) + np.array([0.45, 0.35])
+    span = np.maximum(maximum - minimum, 1e-6)
+
+    def screen(point: np.ndarray) -> tuple[float, float]:
+        x = left + 25 + (point[0] - minimum[0]) / span[0] * (right - left - 50)
+        y = bottom - 20 - (point[2] - minimum[1]) / span[1] * (bottom - top - 40)
+        return float(x), float(y)
+
+    reference_xy = [screen(point) for point in reference]
+    estimated_xy = [screen(point) for point in estimated]
+    for first, second in zip(reference_xy, estimated_xy):
+        draw.line((*first, *second), fill=(192, 201, 197), width=1)
+    draw.line(reference_xy, fill=(49, 145, 101), width=4, joint="curve")
+    draw.line(estimated_xy, fill=(188, 105, 55), width=3, joint="curve")
+    for index, (truth, estimate) in enumerate(zip(reference_xy, estimated_xy)):
+        draw.ellipse(
+            (truth[0] - 4, truth[1] - 4, truth[0] + 4, truth[1] + 4),
+            fill=(49, 145, 101),
+        )
+        draw.ellipse(
+            (estimate[0] - 3, estimate[1] - 3, estimate[0] + 3, estimate[1] + 3),
+            fill=(188, 105, 55),
+        )
+        if index in (0, len(reference) - 1):
+            draw.text(
+                (truth[0] + 6, truth[1] - 7),
+                f"frame {index}",
+                fill=(49, 95, 87),
+                font=font,
+            )
+    ate = absolute_trajectory_error(estimated, reference, align=False)
+    final_error = float(np.linalg.norm(estimated[-1] - reference[-1]))
+    draw.text((75, 378), f"ATE RMSE {ate:.3f} m", fill=(49, 95, 87), font=font)
+    draw.text(
+        (245, 378),
+        f"final drift {final_error:.3f} m",
+        fill=(188, 105, 55),
+        font=font,
+    )
+    draw.text(
+        (420, 378),
+        "green truth   orange estimate",
+        fill=(99, 112, 108),
+        font=font,
+    )
+    return canvas
+
+
+def draw_drift_comparison() -> Image.Image:
+    """Show how a tiny systematic yaw bias accumulates with distance."""
+
+    canvas = Image.new("RGB", (680, 420), (247, 249, 248))
+    draw = ImageDraw.Draw(canvas)
+    font = ImageFont.load_default()
+    draw.text(
+        (14, 12),
+        "The same 0.8 m step, accumulated with a small yaw bias",
+        fill=(24, 33, 31),
+        font=font,
+    )
+    origin = np.array([340.0, 365.0])
+    scale = 12.5
+    draw.line((55, origin[1], 625, origin[1]), fill=(99, 112, 108), width=2)
+    colors = [(49, 145, 101), (74, 116, 173), (188, 105, 55), (220, 65, 65)]
+    biases = [0.0, 0.15, 0.4, 0.8]
+    for color, bias in zip(colors, biases):
+        position = np.zeros(2)
+        track = [position.copy()]
+        heading = 0.0
+        for _ in range(28):
+            heading += np.radians(bias)
+            position += np.array([np.sin(heading), np.cos(heading)]) * 0.8
+            track.append(position.copy())
+        points = [
+            (origin[0] + point[0] * scale, origin[1] - point[1] * scale)
+            for point in track
+        ]
+        draw.line(points, fill=color, width=3, joint="curve")
+        final_drift = abs(track[-1][0])
+        legend_y = 62 + biases.index(bias) * 25
+        draw.line((455, legend_y + 5, 478, legend_y + 5), fill=color, width=3)
+        draw.text(
+            (486, legend_y),
+            f"{bias:.2f} deg/frame -> {final_drift:.2f} m drift",
+            fill=color,
+            font=font,
+        )
+    draw.text(
+        (14, 394),
+        "Random error jitters; systematic bias bends the whole trajectory.",
+        fill=(99, 112, 108),
+        font=font,
+    )
+    return canvas
+
+
+def save_vo_trajectory_animation(
+    path: Path,
+    reference: np.ndarray,
+    estimated: np.ndarray,
+) -> None:
+    """Animate the estimated trajectory growing frame by frame."""
+
+    frames: list[Image.Image] = []
+    for end in list(range(2, len(reference) + 1)) + [len(reference)] * 4:
+        frame = draw_vo_trajectory(reference[:end], estimated[:end])
+        draw = ImageDraw.Draw(frame)
+        draw.text(
+            (14, 400),
+            f"tracking frame {end - 1} / {len(reference) - 1}",
+            fill=(24, 33, 31),
+            font=ImageFont.load_default(),
+        )
+        frames.append(frame)
+    frames[0].save(
+        path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=170,
+        loop=0,
+        optimize=True,
+        disposal=2,
+    )
+
+
 def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     """Generate all committed reference images and return their paths."""
 
@@ -1036,6 +1230,7 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         calibration_teaching_assets()
     )
     pnp_correspondences, pnp_pose = pnp_teaching_assets()
+    vo_reference, vo_result = visual_odometry_scene()
 
     images: dict[str, Image.Image] = {
         "chapter01_input.png": Image.fromarray(source),
@@ -1100,6 +1295,10 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
         "chapter08_reprojection_errors.png": reprojection_figure,
         "chapter09_pnp_correspondences.png": pnp_correspondences,
         "chapter09_pose_top_view.png": pnp_pose,
+        "chapter10_vo_trajectory.png": draw_vo_trajectory(
+            vo_reference, vo_result.centers
+        ),
+        "chapter10_drift_comparison.png": draw_drift_comparison(),
     }
 
     paths = []
@@ -1119,6 +1318,9 @@ def generate_reference_images(output_dir: Path = DEFAULT_OUTPUT) -> list[Path]:
     pnp_gif_path = output_dir / "chapter09_pose_motion.gif"
     save_pnp_motion_animation(pnp_gif_path)
     paths.append(pnp_gif_path)
+    vo_gif_path = output_dir / "chapter10_vo_trajectory.gif"
+    save_vo_trajectory_animation(vo_gif_path, vo_reference, vo_result.centers)
+    paths.append(vo_gif_path)
     return paths
 
 

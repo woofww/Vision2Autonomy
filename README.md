@@ -111,7 +111,7 @@ Every topic follows the same loop:
 | 07 | Lucas-Kanade optical flow and motion cues | ✅ Complete | [Tutorial](chapters/07_optical_flow/README.md) · [Flow](docs/assets/chapter07_optical_flow.png) · [GIF](docs/assets/chapter07_flow_tracking.gif) |
 | 08 | Zhang camera calibration, lens distortion, and undistortion | ✅ Complete | [Tutorial](chapters/08_camera_calibration/README.md) · [Correction](docs/assets/chapter08_distortion_correction.png) · [GIF](docs/assets/chapter08_undistort.gif) |
 | 09 | Normalized DLT, PnP, RANSAC, and camera pose | ✅ Complete | [Tutorial](chapters/09_pnp_pose/README.md) · [Correspondences](docs/assets/chapter09_pnp_correspondences.png) · [GIF](docs/assets/chapter09_pose_motion.gif) |
-| 10 | Visual odometry, trajectory evaluation, and drift | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
+| 10 | PnP visual odometry, pose accumulation, ATE, and drift | ✅ Complete | [Tutorial](chapters/10_visual_odometry/README.md) · [Trajectory](docs/assets/chapter10_vo_trajectory.png) · [GIF](docs/assets/chapter10_vo_trajectory.gif) |
 | 11 | Classification, detection, segmentation, monocular depth | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 | 12 | Lanes, drivable area, tracking, driving-perception integration | 🗓️ Planned | [Roadmap](docs/roadmap.md) |
 
@@ -127,7 +127,7 @@ Every topic follows the same loop:
 
 Convolution stabilizes pixels, edges propose lanes and contours, corners become repeatable landmarks, cross-frame matching supports motion estimation, and stereo disparity plus triangulation recover distance. Every chapter now includes an autonomous-driving role and a concrete failure case so the mathematics has a visible purpose.
 
-Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, stereo depth, Hough line voting, Lucas-Kanade optical flow, lens distortion, and PnP camera pose.
+Before installing anything, try the [interactive GitHub Pages labs](https://woofww.github.io/Vision2Autonomy/) for convolution, Canny, Harris, RANSAC, stereo depth, Hough line voting, Lucas-Kanade optical flow, lens distortion, PnP camera pose, and visual-odometry drift.
 
 ```bash
 git clone https://github.com/woofww/Vision2Autonomy.git

@@ -28,6 +28,19 @@ from vision2autonomy.geometry.pose import (
     pose_reprojection_errors,
     ransac_pnp,
 )
+from vision2autonomy.geometry.odometry import (
+    OdometryResult,
+    TrajectoryAlignment,
+    absolute_trajectory_error,
+    accumulate_relative_poses,
+    align_trajectory,
+    compose_poses,
+    invert_pose,
+    pnp_odometry,
+    pose_matrix,
+    relative_translation_error,
+    trajectory_from_poses,
+)
 
 __all__ = [
     "CalibrationResult",
@@ -52,4 +65,15 @@ __all__ = [
     "estimate_pose_dlt",
     "pose_reprojection_errors",
     "ransac_pnp",
+    "OdometryResult",
+    "TrajectoryAlignment",
+    "absolute_trajectory_error",
+    "accumulate_relative_poses",
+    "align_trajectory",
+    "compose_poses",
+    "invert_pose",
+    "pnp_odometry",
+    "pose_matrix",
+    "relative_translation_error",
+    "trajectory_from_poses",
 ]
